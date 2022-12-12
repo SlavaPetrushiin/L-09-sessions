@@ -4,6 +4,7 @@ import { CommentsService } from './../services/comments_service';
 import { checkBearerAuth } from './../utils/checkBearerAuth';
 import express, {Request, Response} from 'express';
 import { commentValidator } from '../validators/commentValidator';
+import { checkQueryCommentsByPostID, ICommentsByPostID } from '../utils/checkQueryCommentsByPostID';
 
 export const routerComments = express.Router();
 
@@ -68,6 +69,42 @@ routerComments.delete('/:commentId', checkBearerAuth, async (req: Request<{comme
 	}
 
 	res.sendStatus(204);
+})
+
+routerComments.get('/:postId/comments', checkQueryCommentsByPostID,  async (req: Request<{postId: string}, {}, {}, ICommentsByPostID>, res: Response) => {
+	let {postId} = req.params;
+	let {pageNumber,pageSize, sortBy, sortDirection} = req.query;
+
+	let foundedPost = await QueryRepository.getOnePost(postId);
+
+	if(!foundedPost){
+		return res.sendStatus(404);
+	}
+	
+	let comments = await QueryRepository.getCommentsByPostID({pageNumber: pageNumber!, pageSize: pageSize!, sortBy: sortBy!, sortDirection: sortDirection!}, postId)
+
+	res.status(200).send(comments);
+})
+
+routerComments.post('/:postId/comments', checkBearerAuth, commentValidator, checkError, async (req: Request<{postId: string}, {}, {content: string}>, res: Response) => {
+	let {postId} = req.params;
+	let {content} = req.body;
+
+	let user = req.user;
+	
+	let foundedPost = await QueryRepository.getOnePost(postId);
+
+	if(!foundedPost){
+		return res.sendStatus(404);
+	}
+
+	let createdComment = await CommentsService.createComments(user!, content, postId);
+	if(!createdComment){
+		return res.sendStatus(404);
+	}
+	
+
+	res.status(201).send(createdComment);
 })
 
 

@@ -1,5 +1,3 @@
-import { checkBearerAuth } from './../utils/checkBearerAuth';
-import { CommentsService } from './../services/comments_service';
 import { checkBasicAuth } from '../utils/checkBasicAuth';
 import express, {Request, Response} from 'express';
 import { ApiTypes } from '../types/types';
@@ -8,8 +6,6 @@ import { createAndUpdatePostsValidator } from '../validators/postsValidator';
 import { PostService } from '../services/posts_service';
 import { checkQueryPostsAndBlogs, IQueryBlogsAndPosts } from '../utils/checkQueryPostsAndBlogs';
 import { QueryRepository } from '../repositories/query-db-repository';
-import { checkQueryCommentsByPostID, ICommentsByPostID } from '../utils/checkQueryCommentsByPostID';
-import { commentValidator } from '../validators/commentValidator';
 
 export const routerPosts = express.Router();
 
@@ -64,41 +60,4 @@ routerPosts.delete('/:id', checkBasicAuth, async (req: Request<{id: string}>, re
 	}
 
 	res.sendStatus(204);
-})
-
-
-routerPosts.get('/:postId/comments', checkQueryCommentsByPostID,  async (req: Request<{postId: string}, {}, {}, ICommentsByPostID>, res: Response) => {
-	let {postId} = req.params;
-	let {pageNumber,pageSize, sortBy, sortDirection} = req.query;
-
-	let foundedPost = await QueryRepository.getOnePost(postId);
-
-	if(!foundedPost){
-		return res.sendStatus(404);
-	}
-	
-	let comments = await QueryRepository.getCommentsByPostID({pageNumber: pageNumber!, pageSize: pageSize!, sortBy: sortBy!, sortDirection: sortDirection!}, postId)
-
-	res.status(200).send(comments);
-})
-
-routerPosts.post('/:postId/comments', checkBearerAuth, commentValidator, checkError, async (req: Request<{postId: string}, {}, {content: string}>, res: Response) => {
-	let {postId} = req.params;
-	let {content} = req.body;
-
-	let user = req.user;
-	
-	let foundedPost = await QueryRepository.getOnePost(postId);
-
-	if(!foundedPost){
-		return res.sendStatus(404);
-	}
-
-	let createdComment = await CommentsService.createComments(user!, content, postId);
-	if(!createdComment){
-		return res.sendStatus(404);
-	}
-	
-
-	res.status(201).send(createdComment);
 })

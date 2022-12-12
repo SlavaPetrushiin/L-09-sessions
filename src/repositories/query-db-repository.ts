@@ -1,8 +1,7 @@
 import { ApiTypes } from '../types/types';
 import { ICommentsByPostID } from '../utils/checkQueryCommentsByPostID';
 import { IQueryUsers } from '../utils/checkQueryUsers';
-import { BlogsRepository } from './blogs-db-repository';
-import { blogsCollection, postsCollection, usersCollection, commentsCollection, clientsCollection } from "./db";
+import { blogsCollection, postsCollection, commentsCollection, clientsCollection } from "./db";
 
 interface IReqAllBlogs {
 	searchNameTerm: string;

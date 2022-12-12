@@ -1,6 +1,4 @@
 import { ClientsRepository } from './../repositories/clients-db-repository';
-import { QueryRepository } from './../repositories/query-db-repository';
-import { UsersService } from './../services/users_service';
 import { ServiceJWT } from './../services/jwt_service';
 import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
