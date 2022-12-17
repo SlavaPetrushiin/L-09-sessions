@@ -1,46 +1,83 @@
-import { RefreshTokensRepository } from './../repositories/refreshToken-db-repository';
+import { AuthSessionsRepository } from './../repositories/auth-devises-sessions';
 import jwt from "jsonwebtoken";
 import * as dotenv from 'dotenv';
+import { add, getUnixTime } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
+import { ApiTypes } from '../types/types';
 dotenv.config();
 
 const JWT_SECRET = process.env.ACCESS_JWT_SECRET || 'sdfwpsvd';
-const EXPIRES_ACCESS_TIME = '10s';
-const EXPIRES_REFRESH_TIME = '20s';
+const EXPIRES_ACCESS_TIME = "1h" //'10s';
+const EXPIRES_REFRESH_TIME = "2h" //'20s';
 
 export interface TokenInterface {
 	userId: string;
 }
 
+export interface IRefreshTokenPayload extends jwt.JwtPayload {
+	userId: string;
+	deviceID: string;
+}
+
 export class ServiceJWT {
-	static async addJWT(userId: string): Promise<string | null> {
+	static async createSessionWithToken(userId: string, ipAddress: string,): Promise<{ accessToken: string, refreshToken: string } | null> {
 		try {
-			let token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
-			return token;
-		} catch (error) {
-			return null;
-		}
-	}
-
-
-	static async updateRefreshToken(userId: string, ipAddress: string): Promise<{ accessToken: string, refreshToken: string } | null> {
-		try {
+			const deviceID = uuidv4();
 			const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
-			const token = jwt.sign({ userId }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME })
-			const refreshToken = {
-				user: userId,
-				token: token,
-				createdByIp: ipAddress
+			const refreshToken = jwt.sign({ userId, deviceID: deviceID }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
+			const decodedRefreshToken = <IRefreshTokenPayload>jwt.decode(refreshToken);
+
+			const authDeviceSession: ApiTypes.IAuthDevicesSessions = {
+				iat: decodedRefreshToken.iat!,
+				exp: decodedRefreshToken.exp!,
+				deviceID: deviceID,
+				ipAddress: ipAddress,
+				userId: userId,
 			}
 
-			await RefreshTokensRepository.updateRefreshToken(refreshToken);
+			const result = await AuthSessionsRepository.createOrUpdateSession(authDeviceSession);
 
-			return { accessToken, refreshToken: refreshToken.token };
+			if (!result) {
+				return null;
+			}
+
+			return { accessToken, refreshToken };
 		} catch (error) {
 			return null;
 		}
 	}
 
-	// async testUpdate
+	static async updateSessionWithToken(authSession: ApiTypes.IAuthDevicesSessions, ipAddress: string,): Promise<{ accessToken: string, refreshToken: string } | null> {
+		try {
+			const accessToken = jwt.sign({ userId: authSession.userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
+			const refreshToken = jwt.sign({ userId: authSession.userId, deviceID: authSession.deviceID }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
+			const decodedRefreshToken = <IRefreshTokenPayload>jwt.decode(refreshToken);
+
+			const authDeviceSession: ApiTypes.IAuthDevicesSessions = {
+				iat: decodedRefreshToken.iat!,
+				exp: decodedRefreshToken.exp!,
+				deviceID: authSession.deviceID,
+				ipAddress: ipAddress,
+				userId: authSession.userId,
+			}
+
+			const result = await AuthSessionsRepository.createOrUpdateSession(authDeviceSession);
+
+			if (!result) {
+				return null;
+			}
+
+			return { accessToken, refreshToken };
+			return null
+		} catch (error) {
+			return null;
+		}
+	}
+
+	static async removeRefreshToken(authSession: ApiTypes.IAuthDevicesSessions): Promise<boolean> {
+		let { deviceID, userId } = authSession;
+		return AuthSessionsRepository.removeSession(userId, deviceID);
+	}
 
 	static async getUserIdByToken(token: string, secretKey: string): Promise<string | null> {
 		try {
@@ -50,10 +87,5 @@ export class ServiceJWT {
 			return null;
 		}
 	}
-
-	static async removeRefreshToken(userId: string) {
-		return RefreshTokensRepository.removeRefreshTokenByUserID(userId);
-	}
-
 }
 

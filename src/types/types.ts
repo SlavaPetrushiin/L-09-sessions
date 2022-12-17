@@ -68,11 +68,17 @@ export namespace ApiTypes {
 			isConfirmed: boolean;
 		}
 	}
-
 	export interface IRefreshToken{
 		user: string;
 		token: string;
-		//expiresIn: number;
 		createdByIp: string;
+	}
+
+	export interface IAuthDevicesSessions {
+		iat: number;
+		exp: number;
+		deviceID: string;
+		ipAddress: string;
+		userId: string;
 	}
 }

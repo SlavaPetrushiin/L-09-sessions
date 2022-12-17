@@ -1,4 +1,3 @@
-
 import { ModifyResult } from 'mongodb';
 import { ApiTypes } from "../types/types";
 import { v4 as uuidv4 } from 'uuid';
@@ -6,7 +5,6 @@ import { add } from 'date-fns';
 import { ClientsRepository } from '../repositories/clients-db-repository';
 import { Email } from '../lib/email';
 import { logCollection } from '../repositories/db';
-import { ServiceJWT } from './jwt_service';
 const bcrypt = require('bcrypt');
 
 
@@ -40,21 +38,18 @@ async function comparePassword(password: string, hash: string): Promise<boolean>
 
 type RegistrationResponse = Omit<ApiTypes.IClientDB, 'hasPassword' | 'emailConfirmation'>  | null;
 export class AuthService {
-	static async login(loginOrEmail: string, password: string, ipAddress: string): Promise<ApiTypes.IClientDB | null> {
-		let client = await ClientsRepository.getClientByEmailOrLogin(loginOrEmail);
-		if (!client) {
+	static async login(loginOrEmail: string, password: string): Promise<ApiTypes.IClientDB | null> {
+		let user = await ClientsRepository.getClientByEmailOrLogin(loginOrEmail);
+		if (!user) {
 			return null;
 		}
 
-		let isValidPass = await comparePassword(password, client.hasPassword);
+		let isValidPass = await comparePassword(password, user.hasPassword);
 
 		if (!isValidPass) {
 			return null;
 		}
-
-		const accessToken = await ServiceJWT.updateRefreshToken(client.id, ipAddress);
-
-		return client;
+		return user;
 	}
 
 	static async registration(login: string, email: string, password: string): Promise<RegistrationResponse> {
@@ -135,7 +130,6 @@ export class AuthService {
 		}
 
 		let url = getUrlWithCode('confirm-registration?code', newCode);
-		console.log('url-resend', url)
 		await Email.sendEmail(client.email, url);
 
 		// if (!isResendingCode) {

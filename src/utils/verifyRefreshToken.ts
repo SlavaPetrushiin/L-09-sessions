@@ -1,40 +1,35 @@
-import { RefreshTokensRepository } from './../repositories/refreshToken-db-repository';
-import { ClientsRepository } from './../repositories/clients-db-repository';
-import { ServiceJWT } from './../services/jwt_service';
+import { AuthSessionsRepository } from './../repositories/auth-devises-sessions';
+import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from 'express';
 import * as dotenv from 'dotenv';
+import { IRefreshTokenPayload } from "../services/jwt_service";
+import { ClientsRepository } from '../repositories/clients-db-repository';
 dotenv.config();
 
 export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: string }>, res: Response, next: NextFunction) => {
-	let refreshToken = req.cookies.refreshToken;
+	try {
+		let refreshToken = req.cookies.refreshToken;
+		if (!refreshToken) {
+			return res.sendStatus(401);
+		};
 
-	if (!refreshToken) {
-		return res.sendStatus(401);
-	};
+		let decoded = <IRefreshTokenPayload>jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET!);
+		let { userId, deviceID } = decoded;
 
-	const isRefreshCodeExist = await RefreshTokensRepository.checkRefreshTokenInDB(refreshToken)
-	console.log(isRefreshCodeExist)
-	if (!isRefreshCodeExist) return res.sendStatus(401)
+		let user = ClientsRepository.getUSerByID(userId);
+		if (!user) {
+			return res.sendStatus(401);
+		}
 
-	const userId = await ServiceJWT.getUserIdByToken(refreshToken, process.env.REFRESH_JWT_SECRET!);
+		let authSessions = await AuthSessionsRepository.getSession(userId, deviceID);
+		if (!authSessions) {
+			return res.sendStatus(401);
+		}
 
-	if (!userId) {
-		console.log('token expired');
-		return res.sendStatus(401);
-	};
-
-	
-
-	let user = await ClientsRepository.getUSerByID(userId);
-
-	if (!user) {
+		req.authDeviceSession = authSessions;
+		next();
+	} catch (error) {
+		console.log("Not valid refresh token");
 		return res.sendStatus(401);
 	}
-
-	req.user = {
-		email: user?.email!,
-		login: user?.login!,
-		userId: user?.id!
-	};
-	next();
 }

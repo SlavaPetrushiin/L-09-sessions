@@ -49,7 +49,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 
 const startApp = async () => {
   await runDB();
-
   app.listen(port, async () => {
     console.log(`Example app listening on port ${port}`);
   })

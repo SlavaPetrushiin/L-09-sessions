@@ -19,7 +19,7 @@ interface IRegistration {
 }
 
 const MILLISECONDS_IN_HOUR = 3600000;
-const MAX_AGE_COOKIE_MILLISECONDS = 20_000;
+const MAX_AGE_COOKIE_MILLISECONDS = MILLISECONDS_IN_HOUR //20_000;
 
 routerAuth.get('/me', checkBearerAuth, async (req: Request<{}, {}, ILogin>, res: Response) => {
 	let user = req.user;
@@ -30,23 +30,21 @@ routerAuth.post('/login', loginValidator, checkErrorAuth, async (req: Request<{}
 	const { loginOrEmail, password } = req.body;
 	const ipAddress = req.ip;
 	
-	let user = await AuthService.login(loginOrEmail, password, ipAddress);
-
+	let user = await AuthService.login(loginOrEmail, password);
 
 	if (!user) {
 		res.sendStatus(401);
 		return
 	}
-	const tokens = await ServiceJWT.updateRefreshToken(user.id, ipAddress);
+	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress);
 
 	if (!tokens) {
 		res.sendStatus(401);
 		return;
 	}
 
-	return res.status(200)
-						.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, secure: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS })
-						.send({ accessToken: tokens.accessToken });
+	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS })
+	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
 routerAuth.post('/registration', userValidator, checkError, async (req: Request<{}, {}, IRegistration>, res: Response) => {
@@ -99,10 +97,10 @@ routerAuth.post('/registration-email-resending', async (req: Request<{}, {}, { e
 })
 
 routerAuth.post('/refresh-token', verifyRefreshToken, async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
-	let user = req.user;
+	let authSession = req.authDeviceSession;
 	const ipAddress = req.ip;
 
-	let updatedTokens = await ServiceJWT.updateRefreshToken(user!.userId, ipAddress);
+	let updatedTokens = await ServiceJWT.updateSessionWithToken(authSession, ipAddress);
 
 	if (!updatedTokens) {
 		return res.sendStatus(401);
@@ -110,18 +108,13 @@ routerAuth.post('/refresh-token', verifyRefreshToken, async (req: Request<{}, {}
 
 
 	return  res.status(200)
-		.cookie('refreshToken', updatedTokens.refreshToken, { httpOnly: true, secure: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS })
+		.cookie('refreshToken', updatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS }) //secure: true,
 		.send({ accessToken: updatedTokens.accessToken });
 })
 
 routerAuth.post('/logout', verifyRefreshToken, async (req: Request, res: Response) => {
-	let user = req.user;
-
-	if (!user) {
-		return res.sendStatus(401);
-	}
-
-	let isLogout = await ServiceJWT.removeRefreshToken(user.userId);
+	let authSession = req.authDeviceSession;
+	let isLogout = await ServiceJWT.removeRefreshToken(authSession);
 
 	if (!isLogout) {
 		return res.sendStatus(401);
