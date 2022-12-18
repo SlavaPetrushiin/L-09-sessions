@@ -1,7 +1,7 @@
 import { routerAuth } from './routers/authRouter';
 import { routerUsers } from './routers/usersRouter';
 import express, { Request, Response, NextFunction } from 'express';
-import { blogsCollection, postsCollection, runDB, commentsCollection, clientsCollection, logCollection } from './repositories/db';
+import { blogsCollection, postsCollection, runDB, commentsCollection, clientsCollection, logCollection, authDevicesSessions } from './repositories/db';
 import { routerBlogs } from './routers/blogRouter';
 import { routerPosts } from './routers/postsRouter';
 import { routerComments } from './routers/commentsRouter';
@@ -30,9 +30,10 @@ app.use("/testing/all-data", async (req: Request, res: Response) => {
   const p = postsCollection.deleteMany({});
   const u = clientsCollection.deleteMany({});
   const c = commentsCollection.deleteMany({});
+  const s = authDevicesSessions.deleteMany({})
   const l = logCollection.deleteMany({});
 
-  await Promise.all([b, p, u, c, l]);
+  await Promise.all([b, p, u, c, l, s]);
 	res.sendStatus(204);
 })
 
