@@ -8,6 +8,7 @@ import { routerComments } from './routers/commentsRouter';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
+import { routerSecurity } from './routers/securityRouter';
 dotenv.config();
 
 const app = express();
@@ -22,6 +23,7 @@ app.use('/users', routerUsers);
 app.use('/posts', routerPosts);
 app.use('/blogs', routerBlogs);
 app.use('/comments', routerComments);
+app.use('/security', routerSecurity);
 
 app.use("/testing/all-data", async (req: Request, res: Response) => {
   const b = blogsCollection.deleteMany({});

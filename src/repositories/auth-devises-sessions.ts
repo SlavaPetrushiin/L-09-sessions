@@ -34,6 +34,25 @@ class AuthDevicesSessions {
 			return false;
 		}
 	}
+
+	public async removeAllSessionsUserNotCurrent (userId: string, deviceID: string): Promise<boolean>{
+		try {
+			let res = await  authDevicesSessions.deleteMany({userId,  deviceID: {$ne: deviceID} });
+			return res.deletedCount > 0 ? true : false;
+		} catch (error) {
+			console.error(`Error => Not Remove user sessions for userId: ${userId} and deviceID: ${deviceID}`);
+			return false;
+		}
+	}
+
+	public async getSessions(userId?: string): Promise<ApiTypes.IAuthDevicesSessions[]>{
+		let sessions = await  authDevicesSessions.find({userId}).toArray();
+		return sessions.filter(s => (new Date().getTime() / 1000) <= s.exp);
+	}
+
+	public async getDevice(deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null>{
+		return await  authDevicesSessions.findOne({deviceID});
+	}
 }
 
 export const AuthSessionsRepository = new AuthDevicesSessions();
