@@ -3,14 +3,14 @@ import { badPractice } from '../repositories/db';
 import { ApiTypes } from '../types/types';
 import { add } from 'date-fns';
 
-const DURING_SECONDS = 3600;
+const DURING_SECONDS = 10;
 const MAX_COUNT = 5;
 
 export const verifyNumberAttempts = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const ipAddress = req.ip;	
 		const iat = new Date().getTime();
-		const exp = add(iat, {hours: 1}).getTime() //iat + DURING_SECONDS;
+		const exp = add(iat, {seconds: DURING_SECONDS}).getTime() //iat + DURING_SECONDS;
 		const currentDate = new Date().getTime();
 		console.log("ipAddress: ", ipAddress);
 

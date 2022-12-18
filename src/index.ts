@@ -34,7 +34,7 @@ app.use("/testing/all-data", async (req: Request, res: Response) => {
   const bp = badPractice.deleteMany({})
   const l = logCollection.deleteMany({});
 
-  await Promise.all([b, p, u, c, l, s]);
+  await Promise.all([b, p, u, c, l, s, bp]);
 	res.sendStatus(204);
 })
 
