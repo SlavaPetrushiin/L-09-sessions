@@ -19,6 +19,7 @@ export const commentsCollection = db.collection<ApiTypes.ICommentModel>("comment
 export const clientsCollection = db.collection<ApiTypes.IClientDB>("clients");
 export const refreshTokensCollection = db.collection<ApiTypes.IRefreshToken>("refreshToken");
 export const authDevicesSessions = db.collection<ApiTypes.IAuthDevicesSessions>('authDevicesSessions');
+export const badPractice = db.collection<ApiTypes.IBadPractice>("badPractice");
 export const logCollection = db.collection<any>('logs');
 
 export async function runDB(){

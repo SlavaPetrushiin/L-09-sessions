@@ -81,4 +81,11 @@ export namespace ApiTypes {
 		ipAddress: string;
 		userId: string;
 	}
+
+	export interface IBadPractice {
+		ipAddress: string;
+		count: number;
+		iat: number;
+		exp: number;
+	}
 }
