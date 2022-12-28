@@ -32,9 +32,9 @@ app.use("/testing/all-data", async (req: Request, res: Response) => {
   const c = commentsCollection.deleteMany({});
   const s = authDevicesSessions.deleteMany({})
   const bp = badPractice.deleteMany({})
-  const l = logCollection.deleteMany({});
+  //const l = logCollection.deleteMany({});
 
-  await Promise.all([b, p, u, c, l, s, bp]);
+  await Promise.all([b, p, u, c,  s, bp]);
 	res.sendStatus(204);
 })
 
