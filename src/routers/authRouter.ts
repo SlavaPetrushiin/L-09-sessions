@@ -43,7 +43,7 @@ routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<
 	if (!tokens) {
 		return res.sendStatus(401);
 	}
-
+	console.log("user: ", user);
 	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS })
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
