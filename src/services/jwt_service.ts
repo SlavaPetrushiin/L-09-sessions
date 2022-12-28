@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { add, getUnixTime } from 'date-fns';
 import { v4 as uuidv4 } from 'uuid';
 import { ApiTypes } from '../types/types';
+import { logCollection } from '../repositories/db';
 dotenv.config();
 
 const JWT_SECRET = process.env.ACCESS_JWT_SECRET || 'sdfwpsvd';
@@ -44,6 +45,8 @@ export class ServiceJWT {
 			if (!result) {
 				return null;
 			}
+
+			logCollection.insertOne(authDeviceSession);
 
 			return { accessToken, refreshToken };
 		} catch (error) {
