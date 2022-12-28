@@ -75,10 +75,11 @@ export namespace ApiTypes {
 	}
 
 	export interface IAuthDevicesSessions {
-		iat: number;
-		exp: number;
+		ip: string;
+		title: string;
+		lastActiveDate: string;
+		exp: string;
 		deviceID: string;
-		ipAddress: string;
 		userId: string;
 	}
 

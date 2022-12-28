@@ -12,14 +12,9 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 		const iat = new Date().getTime();
 		const exp = add(iat, {seconds: DURING_SECONDS}).getTime() //iat + DURING_SECONDS;
 		const currentDate = new Date().getTime();
-		console.log("ipAddress: ", ipAddress);
 
-		console.log("iat: ", iat);
-		console.log("exp: ", exp);
-		console.log("currentDate: ", currentDate);
 	
 		const foundedBadPractice = await badPractice.findOne({ipAddress});
-		console.log("ipAddress: ", foundedBadPractice);
 
 		if(!foundedBadPractice){
 			const newBadPractice: ApiTypes.IBadPractice = { iat, exp, count: 1, ipAddress };

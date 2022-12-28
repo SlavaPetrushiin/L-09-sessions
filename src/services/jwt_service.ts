@@ -7,8 +7,8 @@ import { ApiTypes } from '../types/types';
 dotenv.config();
 
 const JWT_SECRET = process.env.ACCESS_JWT_SECRET || 'sdfwpsvd';
-const EXPIRES_ACCESS_TIME = "1h" //'10s';
-const EXPIRES_REFRESH_TIME = "2h" //'20s';
+const EXPIRES_ACCESS_TIME = "10h" //'10s';
+const EXPIRES_REFRESH_TIME = "20h" //'20s';
 
 export interface TokenInterface {
 	userId: string;
@@ -19,8 +19,12 @@ export interface IRefreshTokenPayload extends jwt.JwtPayload {
 	deviceID: string;
 }
 
+export const convertJwtPayloadSecondsToIsoDate = (value: number): string => {
+	return new Date(value * 1000).toISOString();
+}
+
 export class ServiceJWT {
-	static async createSessionWithToken(userId: string, ipAddress: string,): Promise<{ accessToken: string, refreshToken: string } | null> {
+	static async createSessionWithToken(userId: string, ipAddress: string, title: string): Promise<{ accessToken: string, refreshToken: string } | null> {
 		try {
 			const deviceID = uuidv4();
 			const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
@@ -28,14 +32,14 @@ export class ServiceJWT {
 			const decodedRefreshToken = <IRefreshTokenPayload>jwt.decode(refreshToken);
 
 			const authDeviceSession: ApiTypes.IAuthDevicesSessions = {
-				iat: decodedRefreshToken.iat!,
-				exp: decodedRefreshToken.exp!,
+				ip: ipAddress,
+				title,
+				lastActiveDate: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.iat!),
+				exp: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.exp!),
 				deviceID: deviceID,
-				ipAddress: ipAddress,
 				userId: userId,
 			}
-
-			const result = await AuthSessionsRepository.createOrUpdateSession(authDeviceSession);
+			const result = await AuthSessionsRepository.createSession(authDeviceSession);
 
 			if (!result) {
 				return null;
@@ -47,28 +51,23 @@ export class ServiceJWT {
 		}
 	}
 
-	static async updateSessionWithToken(authSession: ApiTypes.IAuthDevicesSessions, ipAddress: string,): Promise<{ accessToken: string, refreshToken: string } | null> {
+	static async updateSessionWithToken(authSession: ApiTypes.IAuthDevicesSessions): Promise<{ accessToken: string, refreshToken: string } | null> {
 		try {
 			const accessToken = jwt.sign({ userId: authSession.userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
 			const refreshToken = jwt.sign({ userId: authSession.userId, deviceID: authSession.deviceID }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
 			const decodedRefreshToken = <IRefreshTokenPayload>jwt.decode(refreshToken);
 
-			const authDeviceSession: ApiTypes.IAuthDevicesSessions = {
-				iat: decodedRefreshToken.iat!,
-				exp: decodedRefreshToken.exp!,
-				deviceID: authSession.deviceID,
-				ipAddress: ipAddress,
-				userId: authSession.userId,
-			}
-
-			const result = await AuthSessionsRepository.createOrUpdateSession(authDeviceSession);
+			const result = await AuthSessionsRepository.updateSession({
+				oldLastActiveDate: authSession.lastActiveDate,
+				lastActiveDate: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.iat!),
+				exp: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.exp!),
+			});
 
 			if (!result) {
 				return null;
 			}
 
 			return { accessToken, refreshToken };
-			return null
 		} catch (error) {
 			return null;
 		}

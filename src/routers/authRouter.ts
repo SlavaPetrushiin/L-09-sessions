@@ -19,36 +19,35 @@ interface IRegistration {
 	email: string;
 }
 
-const MILLISECONDS_IN_HOUR = 3600000;
-const MAX_AGE_COOKIE_MILLISECONDS = MILLISECONDS_IN_HOUR //20_000;
+const MILLISECONDS_IN_HOUR = 3_600_000;
+const MAX_AGE_COOKIE_MILLISECONDS = MILLISECONDS_IN_HOUR * 20 //20_000;
 
 routerAuth.get('/me', checkBearerAuth, async (req: Request<{}, {}, ILogin>, res: Response) => {
 	let user = req.user;
 	res.send(user);
 })
 
-routerAuth.post('/login', loginValidator, checkErrorAuth, verifyNumberAttempts,  async (req: Request<{}, {}, ILogin>, res: Response) => {
+routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<{}, {}, ILogin>, res: Response) => {
 	const { loginOrEmail, password } = req.body;
 	const ipAddress = req.ip;
-	
+	const title = req.headers['user-agent'] || "";	
 	let user = await AuthService.login(loginOrEmail, password);
 
 	if (!user) {
-		res.sendStatus(401);
-		return
+		return res.sendStatus(401);		
 	}
-	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress);
+
+	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress, title);
 
 	if (!tokens) {
-		res.sendStatus(401);
-		return;
+		return res.sendStatus(401);
 	}
 
 	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS })
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
-routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts, async (req: Request<{}, {}, IRegistration>, res: Response) => {
+routerAuth.post('/registration', userValidator, checkError,  async (req: Request<{}, {}, IRegistration>, res: Response) => {
 	let { login, password, email } = req.body;
 	let result = await AuthService.registration(login, email, password);
 
@@ -60,7 +59,7 @@ routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration-confirmation', verifyNumberAttempts, async (req: Request<{}, {}, { code: string }>, res: Response) => {
+routerAuth.post('/registration-confirmation',  async (req: Request<{}, {}, { code: string }>, res: Response) => {
 	let { code } = req.body;
 	let result = await AuthService.confirmCode(code);
 	if (!result) {
@@ -78,7 +77,7 @@ routerAuth.post('/registration-confirmation', verifyNumberAttempts, async (req: 
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration-email-resending', verifyNumberAttempts, async (req: Request<{}, {}, { email: string }>, res: Response) => {
+routerAuth.post('/registration-email-resending',  async (req: Request<{}, {}, { email: string }>, res: Response) => {
 	let { email } = req.body;
 	let result = await AuthService.confirmResending(email);
 
@@ -97,20 +96,17 @@ routerAuth.post('/registration-email-resending', verifyNumberAttempts, async (re
 	res.sendStatus(204);
 })
 
-routerAuth.post('/refresh-token', verifyRefreshToken, async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
+routerAuth.post('/refresh-token', verifyRefreshToken,  async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
 	let authSession = req.authDeviceSession;
-	const ipAddress = req.ip;
+	let isUpdatedTokens = await ServiceJWT.updateSessionWithToken(authSession);
 
-	let updatedTokens = await ServiceJWT.updateSessionWithToken(authSession, ipAddress);
-
-	if (!updatedTokens) {
+	if (!isUpdatedTokens) {
 		return res.sendStatus(401);
 	}
 
-
 	return  res.status(200)
-		.cookie('refreshToken', updatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS }) //secure: true,
-		.send({ accessToken: updatedTokens.accessToken });
+		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS }) //secure: true,
+		.send({ accessToken: isUpdatedTokens.accessToken });
 })
 
 routerAuth.post('/logout', verifyRefreshToken, async (req: Request, res: Response) => {

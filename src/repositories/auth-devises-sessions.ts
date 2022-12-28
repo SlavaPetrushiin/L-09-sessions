@@ -1,14 +1,16 @@
 import { ApiTypes } from "../types/types";
 import { authDevicesSessions } from "./db";
 
+
+interface IPramsForUpdateRefreshToken {
+	oldLastActiveDate: string;
+	lastActiveDate: string;
+	exp: string;
+} 
 class AuthDevicesSessions {
-	public async createOrUpdateSession(dataSession: ApiTypes.IAuthDevicesSessions): Promise<boolean> {
+	public async createSession(dataSession: ApiTypes.IAuthDevicesSessions): Promise<boolean> {
 		try {
-			let result = await authDevicesSessions.updateOne(
-				{ userId: dataSession.userId, deviceID: dataSession.deviceID },
-				{ $set: { ...dataSession } },
-				{ upsert: true }
-			);
+			let result = await authDevicesSessions.insertOne(dataSession);
 			return result.acknowledged;
 		} catch (error) {
 			console.error(`Error => Not create Session: ${dataSession}`);
@@ -16,9 +18,9 @@ class AuthDevicesSessions {
 		}
 	}
 
-	public async getSession(userId: string, deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null> {
+	public async getSession(iat: string, userId: string, deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null> {
 		try {
-			return authDevicesSessions.findOne({ userId, deviceID }, { projection: { _id: false } });
+			return authDevicesSessions.findOne({lastActiveDate: iat, userId, deviceID }, { projection: { _id: false } });
 		} catch (error) {
 			console.error(`Error => Not Session for userId: ${userId} and deviceID: ${deviceID}`);
 			return null;
@@ -45,9 +47,17 @@ class AuthDevicesSessions {
 		}
 	}
 
-	public async getSessions(userId?: string): Promise<ApiTypes.IAuthDevicesSessions[]>{
-		let sessions = await  authDevicesSessions.find({userId}).toArray();
-		return sessions.filter(s => (new Date().getTime() / 1000) <= s.exp);
+	public async updateSession(params: IPramsForUpdateRefreshToken){
+		try {
+			let res = await  authDevicesSessions.updateOne({lastActiveDate: params.oldLastActiveDate}, {$set: {lastActiveDate: params.lastActiveDate, exp: params.exp}});
+			if (res.matchedCount == 0) {
+				return false;
+			}
+			return true;
+		} catch (error) {
+			console.error(`Error => Not update refresh token`);
+			return false;
+		}
 	}
 
 	public async getDevice(deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null>{
