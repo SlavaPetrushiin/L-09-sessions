@@ -41,12 +41,12 @@ export class ServiceJWT {
 				userId: userId,
 			}
 			const result = await AuthSessionsRepository.createSession(authDeviceSession);
+			logCollection.insertOne({...authDeviceSession, result});
 
 			if (!result) {
 				return null;
 			}
 
-			logCollection.insertOne(authDeviceSession);
 
 			return { accessToken, refreshToken };
 		} catch (error) {

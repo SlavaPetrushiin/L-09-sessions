@@ -38,8 +38,6 @@ routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<
 		return res.sendStatus(401);		
 	}
 
-	logCollection.insertOne(user);
-
 	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress, title);
 
 	if (!tokens) {
