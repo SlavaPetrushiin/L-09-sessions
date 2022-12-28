@@ -6,10 +6,14 @@ import express, { Request, Response } from "express";
 export const routerSecurity = express.Router();
 
 routerSecurity.get("/devices", verifyRefreshToken, async (req: Request, res: Response) => {
+	logCollection.insertOne({
+		url: "/devices",
+		authSession: req.authDeviceSession
+	})
 	let authSession = req.authDeviceSession;
 	let allSessions = await AuthSessionsRepository.getSessions(authSession.userId);
+
 	
-	logCollection.insertMany(allSessions!)
 	res.send(allSessions);
 })
 
