@@ -7,7 +7,6 @@ export const routerSecurity = express.Router();
 routerSecurity.get("/devices", verifyRefreshToken, async (req: Request, res: Response) => {
 	let authSession = req.authDeviceSession;
 	let allSessions = await AuthSessionsRepository.getSessions(authSession.userId);
-
 	res.send(allSessions);
 })
 

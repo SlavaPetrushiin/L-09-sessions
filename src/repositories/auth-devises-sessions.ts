@@ -20,9 +20,18 @@ class AuthDevicesSessions {
 
 	public async getSession(iat: string, userId: string, deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null> {
 		try {
-			return authDevicesSessions.findOne({lastActiveDate: iat, userId, deviceID }, { projection: { _id: false } });
+			return authDevicesSessions.findOne({lastActiveDate: iat, userId, deviceID }, { projection: { _id: false,  } });
 		} catch (error) {
 			console.error(`Error => Not Session for userId: ${userId} and deviceID: ${deviceID}`);
+			return null;
+		}
+	}
+
+	public async getSessions(userId: string): Promise<ApiTypes.IAuthDevicesSessions[] | null> {
+		try {
+			return authDevicesSessions.find({ userId}, { projection: { _id: false,  exp: false, userId: false } }).toArray();
+		} catch (error) {
+			console.error(`Error => Not Sessions for userId: ${userId}`);
 			return null;
 		}
 	}

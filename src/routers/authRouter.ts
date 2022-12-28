@@ -32,7 +32,7 @@ routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<
 	const ipAddress = req.ip;
 	const title = req.headers['user-agent'] || "";	
 	let user = await AuthService.login(loginOrEmail, password);
-
+	console.log(user);
 	if (!user) {
 		return res.sendStatus(401);		
 	}
