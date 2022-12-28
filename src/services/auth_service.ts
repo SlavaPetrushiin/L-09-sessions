@@ -66,7 +66,7 @@ export class AuthService {
 			return null;
 		}
 		const code = uuidv4()
-		logCollection.insertOne({ code: code, url: 'registration', mail: email })
+
 		let client: ApiTypes.IClientDB = {
 			email,
 			login,
@@ -121,7 +121,6 @@ export class AuthService {
 		if (client.emailConfirmation.isConfirmed) return null;
 
 		let newCode = uuidv4();
-		logCollection.insertOne({ code: newCode, url: 'resend', mail: emailOrLogin })
 		let newExpirationData = add(new Date(), { hours: 1, minutes: 3 });
 		let isUpdatedClient = await ClientsRepository.updateClient(client.id, newCode, newExpirationData);
 		console.log("confirmResending: ", isUpdatedClient,);

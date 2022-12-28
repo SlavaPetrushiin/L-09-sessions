@@ -1,3 +1,4 @@
+import { logCollection } from './../repositories/db';
 import { AuthSessionsRepository } from '../repositories/auth-devises-sessions';
 import { verifyRefreshToken } from './../utils/verifyRefreshToken';
 import express, { Request, Response } from "express";
@@ -7,6 +8,8 @@ export const routerSecurity = express.Router();
 routerSecurity.get("/devices", verifyRefreshToken, async (req: Request, res: Response) => {
 	let authSession = req.authDeviceSession;
 	let allSessions = await AuthSessionsRepository.getSessions(authSession.userId);
+	
+	logCollection.insertMany(allSessions!)
 	res.send(allSessions);
 })
 

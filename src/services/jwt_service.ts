@@ -47,7 +47,6 @@ export class ServiceJWT {
 				return null;
 			}
 
-
 			return { accessToken, refreshToken };
 		} catch (error) {
 			return null;

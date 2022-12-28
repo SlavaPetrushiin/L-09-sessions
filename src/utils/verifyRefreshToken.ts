@@ -23,7 +23,7 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 		}
 
 		let authSessions = await AuthSessionsRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat!), userId, deviceID);
-
+		
 		if (!authSessions) {
 			return res.sendStatus(401);
 		}
