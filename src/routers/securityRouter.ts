@@ -33,7 +33,9 @@ routerSecurity.delete("/devices/:deviceId", verifyRefreshToken, async (req: Requ
 	if(authSession.userId != foundedDevice.userId){ res.sendStatus(403) }
 
 	let isDeletedSessions = await AuthSessionsRepository.removeSession(authSession.userId, authSession.deviceId);
-	if(!isDeletedSessions){ res.sendStatus(401) }
+	if(!isDeletedSessions){
+		return res.sendStatus(401)
+	}
 
 	res.sendStatus(204);
 })
