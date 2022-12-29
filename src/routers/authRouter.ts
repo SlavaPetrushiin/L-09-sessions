@@ -105,8 +105,9 @@ routerAuth.post('/refresh-token', verifyRefreshToken,  async (req: Request<{}, {
 		return res.sendStatus(401);
 	}
 
-	return  res.status(200)
-		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true }) //secure: true,
+	return  res
+		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
+		.status(200)
 		.send({ accessToken: isUpdatedTokens.accessToken });
 })
 
