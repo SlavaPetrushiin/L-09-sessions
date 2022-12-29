@@ -23,14 +23,16 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 		}
 
 		let authSessions = await AuthSessionsRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat!), userId, deviceId);
+		console.log("authSessions: ", authSessions);
 		
 		if (!authSessions) {
+			console.error('!authSessions')
 			return res.sendStatus(401);
 		}
 
 		req.authDeviceSession = authSessions;
 		console.log('====================================');
-		console.log('MIDDLEWARE: NEXT');
+		console.log('MIDDLEWARE:NEXT');
 		console.log('====================================');
 		next();
 	} catch (error) {
