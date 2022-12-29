@@ -102,9 +102,12 @@ routerAuth.post('/refresh-token', verifyRefreshToken,  async (req: Request<{}, {
 	let isUpdatedTokens = await ServiceJWT.updateSessionWithToken(authSession);
 
 	if (!isUpdatedTokens) {
+		console.log('====================================');
+		console.log('!isUpdatedTokens');
+		console.log('====================================');
 		return res.sendStatus(401);
 	}
-
+	console.log('refresh OK');
 	return  res
 		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 		.status(200)

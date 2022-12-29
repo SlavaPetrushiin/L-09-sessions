@@ -1,10 +1,10 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { AuthSessionsRepository } from './../repositories/auth-devises-sessions';
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from 'express';
-import * as dotenv from 'dotenv';
 import { IRefreshTokenPayload, convertJwtPayloadSecondsToIsoDate } from "../services/jwt_service";
 import { ClientsRepository } from '../repositories/clients-db-repository';
-dotenv.config();
 
 export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: string }>, res: Response, next: NextFunction) => {
 	try {
@@ -29,6 +29,9 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 		}
 
 		req.authDeviceSession = authSessions;
+		console.log('====================================');
+		console.log('MIDDLEWARE: NEXT');
+		console.log('====================================');
 		next();
 	} catch (error) {
 		console.log("Not valid refresh token");
