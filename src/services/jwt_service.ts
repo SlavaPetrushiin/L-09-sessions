@@ -71,6 +71,7 @@ export class ServiceJWT {
 
 			return { accessToken, refreshToken };
 		} catch (error) {
+			console.error("Not updated refresh token: " + error);
 			return null;
 		}
 	}

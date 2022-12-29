@@ -98,9 +98,10 @@ routerAuth.post('/registration-email-resending',  async (req: Request<{}, {}, { 
 })
 
 routerAuth.post('/refresh-token', verifyRefreshToken,  async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
+	console.log("we here!");
 	let authSession = req.authDeviceSession;
 	let isUpdatedTokens = await ServiceJWT.updateSessionWithToken(authSession);
-
+	console.log("after we here!");
 	if (!isUpdatedTokens) {
 		console.log('====================================');
 		console.log('!isUpdatedTokens');

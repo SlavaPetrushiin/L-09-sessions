@@ -26,7 +26,6 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 		console.log("authSessions: ", authSessions);
 		
 		if (!authSessions) {
-			console.error('!authSessions')
 			return res.sendStatus(401);
 		}
 
@@ -36,7 +35,7 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 		console.log('====================================');
 		next();
 	} catch (error) {
-		console.log("Not valid refresh token");
+		console.error("Not valid refresh token");
 		return res.sendStatus(401);
 	}
 }
