@@ -79,7 +79,7 @@ export namespace ApiTypes {
 		title: string;
 		lastActiveDate: string;
 		exp: string;
-		deviceID: string;
+		deviceId: string;
 		userId: string;
 	}
 

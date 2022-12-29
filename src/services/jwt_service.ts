@@ -17,7 +17,7 @@ export interface TokenInterface {
 
 export interface IRefreshTokenPayload extends jwt.JwtPayload {
 	userId: string;
-	deviceID: string;
+	deviceId: string;
 }
 
 export const convertJwtPayloadSecondsToIsoDate = (value: number): string => {
@@ -27,9 +27,9 @@ export const convertJwtPayloadSecondsToIsoDate = (value: number): string => {
 export class ServiceJWT {
 	static async createSessionWithToken(userId: string, ipAddress: string, title: string): Promise<{ accessToken: string, refreshToken: string } | null> {
 		try {
-			const deviceID = uuidv4();
+			const deviceId = uuidv4();
 			const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
-			const refreshToken = jwt.sign({ userId, deviceID: deviceID }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
+			const refreshToken = jwt.sign({ userId, deviceId: deviceId }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
 			const decodedRefreshToken = <IRefreshTokenPayload>jwt.decode(refreshToken);
 
 			const authDeviceSession: ApiTypes.IAuthDevicesSessions = {
@@ -37,7 +37,7 @@ export class ServiceJWT {
 				title,
 				lastActiveDate: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.iat!),
 				exp: convertJwtPayloadSecondsToIsoDate(decodedRefreshToken.exp!),
-				deviceID: deviceID,
+				deviceId: deviceId,
 				userId: userId,
 			}
 			const result = await AuthSessionsRepository.createSession(authDeviceSession);
@@ -56,7 +56,7 @@ export class ServiceJWT {
 	static async updateSessionWithToken(authSession: ApiTypes.IAuthDevicesSessions): Promise<{ accessToken: string, refreshToken: string } | null> {
 		try {
 			const accessToken = jwt.sign({ userId: authSession.userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
-			const refreshToken = jwt.sign({ userId: authSession.userId, deviceID: authSession.deviceID }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
+			const refreshToken = jwt.sign({ userId: authSession.userId, deviceId: authSession.deviceId }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
 			const decodedRefreshToken = <IRefreshTokenPayload>jwt.decode(refreshToken);
 
 			const result = await AuthSessionsRepository.updateSession({
@@ -76,8 +76,8 @@ export class ServiceJWT {
 	}
 
 	static async removeRefreshToken(authSession: ApiTypes.IAuthDevicesSessions): Promise<boolean> {
-		let { deviceID, userId } = authSession;
-		return AuthSessionsRepository.removeSession(userId, deviceID);
+		let { deviceId, userId } = authSession;
+		return AuthSessionsRepository.removeSession(userId, deviceId);
 	}
 
 	static async getUserIdByToken(token: string, secretKey: string): Promise<string | null> {

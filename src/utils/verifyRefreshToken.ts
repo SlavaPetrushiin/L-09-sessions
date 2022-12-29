@@ -15,14 +15,14 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 		};
 
 		let decoded = await <IRefreshTokenPayload>jwt.verify(refreshToken, process.env.REFRESH_JWT_SECRET!);
-		let { userId, deviceID, iat } = decoded;
+		let { userId, deviceId, iat } = decoded;
 
 		let user = await ClientsRepository.getUSerByID(userId);
 		if (!user) {
 			return res.sendStatus(401);
 		}
 
-		let authSessions = await AuthSessionsRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat!), userId, deviceID);
+		let authSessions = await AuthSessionsRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat!), userId, deviceId);
 		
 		if (!authSessions) {
 			return res.sendStatus(401);

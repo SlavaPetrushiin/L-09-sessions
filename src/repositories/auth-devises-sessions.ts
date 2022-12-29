@@ -18,11 +18,11 @@ class AuthDevicesSessions {
 		}
 	}
 
-	public async getSession(iat: string, userId: string, deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null> {
+	public async getSession(iat: string, userId: string, deviceId: string): Promise<ApiTypes.IAuthDevicesSessions | null> {
 		try {
-			return authDevicesSessions.findOne({lastActiveDate: iat, userId, deviceID }, { projection: { _id: false,  } });
+			return authDevicesSessions.findOne({lastActiveDate: iat, userId, deviceId }, { projection: { _id: false,  } });
 		} catch (error) {
-			console.error(`Error => Not Session for userId: ${userId} and deviceID: ${deviceID}`);
+			console.error(`Error => Not Session for userId: ${userId} and deviceId: ${deviceId}`);
 			return null;
 		}
 	}
@@ -36,22 +36,22 @@ class AuthDevicesSessions {
 		}
 	}
 
-	public async removeSession (userId: string, deviceID: string): Promise<boolean>{
+	public async removeSession (userId: string, deviceId: string): Promise<boolean>{
 		try {
-			let res = await  authDevicesSessions.deleteOne({userId, deviceID});
+			let res = await  authDevicesSessions.deleteOne({userId, deviceId});
 			return res.deletedCount > 0 ? true : false;
 		} catch (error) {
-			console.error(`Error => Not Remove Session for userId: ${userId} and deviceID: ${deviceID}`);
+			console.error(`Error => Not Remove Session for userId: ${userId} and deviceId: ${deviceId}`);
 			return false;
 		}
 	}
 
-	public async removeAllSessionsUserNotCurrent (userId: string, deviceID: string): Promise<boolean>{
+	public async removeAllSessionsUserNotCurrent (userId: string, deviceId: string): Promise<boolean>{
 		try {
-			let res = await  authDevicesSessions.deleteMany({userId,  deviceID: {$ne: deviceID} });
+			let res = await  authDevicesSessions.deleteMany({userId,  deviceId: {$ne: deviceId} });
 			return res.deletedCount > 0 ? true : false;
 		} catch (error) {
-			console.error(`Error => Not Remove user sessions for userId: ${userId} and deviceID: ${deviceID}`);
+			console.error(`Error => Not Remove user sessions for userId: ${userId} and deviceId: ${deviceId}`);
 			return false;
 		}
 	}
@@ -69,8 +69,8 @@ class AuthDevicesSessions {
 		}
 	}
 
-	public async getDevice(deviceID: string): Promise<ApiTypes.IAuthDevicesSessions | null>{
-		return await  authDevicesSessions.findOne({deviceID});
+	public async getDevice(deviceId: string): Promise<ApiTypes.IAuthDevicesSessions | null>{
+		return await  authDevicesSessions.findOne({deviceId});
 	}
 }
 
