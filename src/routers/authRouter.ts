@@ -28,7 +28,7 @@ routerAuth.get('/me', checkBearerAuth, async (req: Request<{}, {}, ILogin>, res:
 	res.send(user);
 })
 
-routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<{}, {}, ILogin>, res: Response) => {
+routerAuth.post('/login', loginValidator, checkErrorAuth, verifyNumberAttempts,   async (req: Request<{}, {}, ILogin>, res: Response) => {
 	const { loginOrEmail, password } = req.body;
 	const ipAddress = req.ip;
 	const title = req.headers['user-agent'] || "";	
@@ -48,7 +48,7 @@ routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
-routerAuth.post('/registration', userValidator, checkError,  async (req: Request<{}, {}, IRegistration>, res: Response) => {
+routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts,  async (req: Request<{}, {}, IRegistration>, res: Response) => {
 	let { login, password, email } = req.body;
 	let result = await AuthService.registration(login, email, password);
 
@@ -60,7 +60,7 @@ routerAuth.post('/registration', userValidator, checkError,  async (req: Request
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration-confirmation',  async (req: Request<{}, {}, { code: string }>, res: Response) => {
+routerAuth.post('/registration-confirmation', verifyNumberAttempts,  async (req: Request<{}, {}, { code: string }>, res: Response) => {
 	let { code } = req.body;
 	let result = await AuthService.confirmCode(code);
 	if (!result) {
@@ -78,7 +78,7 @@ routerAuth.post('/registration-confirmation',  async (req: Request<{}, {}, { cod
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration-email-resending',  async (req: Request<{}, {}, { email: string }>, res: Response) => {
+routerAuth.post('/registration-email-resending', verifyNumberAttempts,  async (req: Request<{}, {}, { email: string }>, res: Response) => {
 	let { email } = req.body;
 	let result = await AuthService.confirmResending(email);
 

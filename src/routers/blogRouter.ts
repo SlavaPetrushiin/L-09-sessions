@@ -11,8 +11,6 @@ import { checkQueryPostsAndBlogs, IQueryBlogsAndPosts } from '../utils/checkQuer
 export const routerBlogs = express.Router();
 
 routerBlogs.get('/', checkQueryPostsAndBlogs, async (req: Request<{}, {}, {}, IQueryBlogsAndPosts>, res: Response) => {
-	console.log(req.baseUrl);
-
 	let { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = req.query;
 	let blogs = await QueryRepository.getAllBlogs({
 		searchNameTerm: searchNameTerm!,
