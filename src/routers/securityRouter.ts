@@ -36,6 +36,7 @@ routerSecurity.delete("/devices/:deviceId", verifyRefreshToken, async (req: Requ
 	}
 	console.log("NOT NOT NOT");
 	if (authSession.userId != foundedDevice.userId) {
+		console.log("NOT authSession");
 		return res.sendStatus(403);
 	}
 	console.log("authSession.userId: ", authSession.userId);
