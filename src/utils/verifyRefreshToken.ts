@@ -9,7 +9,6 @@ import { ClientsRepository } from '../repositories/clients-db-repository';
 export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: string }>, res: Response, next: NextFunction) => {
 	try {
 		let refreshToken = req.cookies.refreshToken;
-		const ipAddress = req.ip;
 
 		if (!refreshToken) {
 			return res.sendStatus(401);
@@ -23,7 +22,7 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 			return res.sendStatus(401);
 		}
 
-		let authSessions = await AuthSessionsRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat!), userId, deviceId, ipAddress);
+		let authSessions = await AuthSessionsRepository.getSession(convertJwtPayloadSecondsToIsoDate(iat!), userId, deviceId);
 		
 		if (!authSessions) {
 			return res.sendStatus(401);
