@@ -31,17 +31,17 @@ routerSecurity.delete("/devices/:deviceId", verifyRefreshToken, async (req: Requ
 	let foundedDevice = await AuthSessionsRepository.getDevice(deviceId);
 	console.log("foundedDevice: ", foundedDevice);
 	if (!foundedDevice) {
-		return res.sendStatus(404)
+		return res.sendStatus(404);
 	}
 	if (authSession.userId != foundedDevice.userId) {
-		return res.sendStatus(403)
+		return res.sendStatus(403);
 	}
 	console.log("authSession.userId: ", authSession.userId);
 	console.log("authSession.deviceId: ", authSession.deviceId);
 	let isDeletedSessions = await AuthSessionsRepository.removeSession(authSession.userId, authSession.deviceId);
-	if (!isDeletedSessions) {
-		return res.sendStatus(401)
-	}
+	// if (!isDeletedSessions) {
+	// 	return res.sendStatus(401);
+	// }
 
 	res.sendStatus(204);
 })

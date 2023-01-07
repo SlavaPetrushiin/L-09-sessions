@@ -43,7 +43,7 @@ routerAuth.post('/login', loginValidator, checkErrorAuth,   async (req: Request<
 	if (!tokens) {
 		return res.sendStatus(401);
 	}
-	console.log("user: ", user);
+
 	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
@@ -98,17 +98,12 @@ routerAuth.post('/registration-email-resending',  async (req: Request<{}, {}, { 
 })
 
 routerAuth.post('/refresh-token', verifyRefreshToken,  async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
-	console.log("we here!");
 	let authSession = req.authDeviceSession;
 	let isUpdatedTokens = await ServiceJWT.updateSessionWithToken(authSession);
-	console.log("after we here!");
 	if (!isUpdatedTokens) {
-		console.log('====================================');
-		console.log('!isUpdatedTokens');
-		console.log('====================================');
 		return res.sendStatus(401);
 	}
-	console.log('refresh OK');
+
 	return  res
 		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 		.status(200)
