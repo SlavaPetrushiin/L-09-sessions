@@ -70,8 +70,8 @@ class AuthDevicesSessions {
 		}
 	}
 
-	public async getDevice(deviceId: string): Promise<ApiTypes.IAuthDevicesSessions | null>{
-		return await  authDevicesSessions.findOne({deviceId});
+	public async getDevice(deviceId: string, userId: string, ip: string): Promise<ApiTypes.IAuthDevicesSessions | null>{
+		return await  authDevicesSessions.findOne({deviceId, userId, ip });
 	}
 }
 
