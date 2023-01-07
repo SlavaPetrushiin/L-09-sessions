@@ -47,3 +47,4 @@ routerSecurity.delete("/devices/:deviceId", verifyRefreshToken, async (req: Requ
 
 	res.sendStatus(204);
 })
+
