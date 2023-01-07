@@ -39,6 +39,7 @@ class AuthDevicesSessions {
 	public async removeSession (userId: string, deviceId: string): Promise<boolean>{
 		try {
 			let res = await  authDevicesSessions.deleteOne({userId, deviceId});
+			console.log("REMOVE SESSION: ", res);
 			return res.deletedCount > 0 ? true : false;
 		} catch (error) {
 			console.error(`Error => Not Remove Session for userId: ${userId} and deviceId: ${deviceId}`);
