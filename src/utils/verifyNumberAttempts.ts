@@ -37,7 +37,9 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 		if(foundedBadPractice.count >= MAX_COUNT && currentDate < foundedBadPractice.exp){
 			return res.sendStatus(429);
 		}
-		
+
+		console.log("WEEEEEEE WWWWWWWW");
+		next();		
 	} catch (error) {
 		console.error("Error: VerifyNumberAttempts");
 		return res.sendStatus(429);
