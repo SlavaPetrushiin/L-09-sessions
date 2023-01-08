@@ -17,9 +17,9 @@ routerSecurity.get("/devices", verifyRefreshToken, async (req: Request, res: Res
 
 routerSecurity.delete("/devices", verifyRefreshToken, async (req: Request, res: Response) => {
 	let authSession = req.authDeviceSession;
-	let allSessions = await AuthSessionsRepository.removeAllSessionsUserNotCurrent(authSession.userId, authSession.deviceId);
+	await AuthSessionsRepository.removeAllSessionsUserNotCurrent(authSession.userId, authSession.deviceId);
 
-	res.send(allSessions);
+	res.sendStatus(204);
 })
 
 routerSecurity.delete("/devices/:deviceId", verifyRefreshToken, async (req: Request<{ deviceId: string }>, res: Response) => {
