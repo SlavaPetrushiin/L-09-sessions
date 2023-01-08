@@ -38,7 +38,6 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 			return res.sendStatus(429);
 		}
 
-		console.log("WEEEEEEE WWWWWWWW");
 		next();		
 	} catch (error) {
 		console.error("Error: VerifyNumberAttempts");

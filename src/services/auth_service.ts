@@ -123,7 +123,7 @@ export class AuthService {
 		let newCode = uuidv4();
 		let newExpirationData = add(new Date(), { hours: 1, minutes: 3 });
 		let isUpdatedClient = await ClientsRepository.updateClient(client.id, newCode, newExpirationData);
-		console.log("confirmResending: ", isUpdatedClient,);
+
 		if (!isUpdatedClient) {
 			return null;
 		}

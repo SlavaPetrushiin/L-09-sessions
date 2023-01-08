@@ -33,7 +33,7 @@ class CommentsRepositoryModel {
 			let result = await commentsCollection.deleteOne({ id: commentId });
 			return result.deletedCount > 0 ? true : false;
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			return false;
 		}
 	}

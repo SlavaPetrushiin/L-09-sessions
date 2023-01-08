@@ -20,9 +20,6 @@ export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: str
 
 		let user = await ClientsRepository.getUSerByID(userId);
 		let users = await clientsCollection.find({}).toArray();
-		console.log('userId: ', userId)
-		console.log('user: ', user)
-		console.log('users: ', users);
 
 		if (!user) {
 			return res.sendStatus(401);

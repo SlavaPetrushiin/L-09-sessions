@@ -18,7 +18,7 @@ class RefreshTokenModel {
 			await refreshTokensCollection.updateOne({ user }, { $set: { token,  createdByIp}}, {upsert: true});
 			return true;
 		} catch (error) {
-			console.log('Not updated RefreshToken');
+			console.error('Not updated RefreshToken');
 			return false;
 		}
 	}

@@ -26,11 +26,10 @@ class EmailSend {
 				to: email,
 				html: url,
 			});
-			console.log("INFO: ", info);
+
 			return true;
 		} catch (error) {
-			console.log("ERROR: ", error);
-			return false;
+				return false;
 		}
 	}
 }
