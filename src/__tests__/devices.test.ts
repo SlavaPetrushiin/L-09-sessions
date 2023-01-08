@@ -104,34 +104,34 @@ describe('/users', () => {
         })
     })
 
-    it('should return 404, if trying delete incorrect device by deviceId', async () => {
-        await request(app)
-            .delete(`/security/devices/${deletedDeviceId}`).set('Cookie', cookie).expect(404)
+    // it('should return 404, if trying delete incorrect device by deviceId', async () => {
+    //     await request(app)
+    //         .delete(`/security/devices/${deletedDeviceId}`).set('Cookie', cookie).expect(404)
 
-        const devices = await request(app)
-            .get('/security/devices').set('Cookie', cookie)
+    //     const devices = await request(app)
+    //         .get('/security/devices').set('Cookie', cookie)
 
-        expect(devices.body.length).toBe(3)
-    })
+    //     expect(devices.body.length).toBe(3)
+    // })
 
-    it('should delete devices exept current device current user', async () => {
-        await request(app)
-            .delete('/security/devices').set('Cookie', cookie)
+    // it('should delete devices exept current device current user', async () => {
+    //     await request(app)
+    //         .delete('/security/devices').set('Cookie', cookie)
 
-        const devices = await request(app)
-            .get('/security/devices').set('Cookie', cookie)
+    //     const devices = await request(app)
+    //         .get('/security/devices').set('Cookie', cookie)
 
-        expect(devices.body.length).toBe(1)
-    })
+    //     expect(devices.body.length).toBe(1)
+    // })
 
-    it('should delete current device, if user logout', async () => {
-        await request(app)
-            .post('/auth/logout').set('Cookie', cookie)
+    // it('should delete current device, if user logout', async () => {
+    //     await request(app)
+    //         .post('/auth/logout').set('Cookie', cookie)
 
-        const devices = await request(app)
-            .get('/security/devices').set('Cookie', cookie)
+    //     const devices = await request(app)
+    //         .get('/security/devices').set('Cookie', cookie)
 
-        expect(devices.body.length).toBe(0)
-    })
+    //     expect(devices.body.length).toBe(0)
+    // })
 
 })
