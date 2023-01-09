@@ -84,9 +84,11 @@ export namespace ApiTypes {
 	}
 
 	export interface IBadPractice {
-		ipAddress: string;
-		count: number;
-		iat: number;
-		exp: number;
+		ip: string;
+		connectionUrl: string,
+		connectionDate: Date
+		// count: number;
+		// iat: number;
+		// exp: number;
 	}
 }
