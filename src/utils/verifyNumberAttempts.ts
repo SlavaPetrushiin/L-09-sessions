@@ -11,6 +11,7 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 		const ipAddress = req.ip;
 		const iat = new Date().getTime();
 		const exp = add(iat, { seconds: DURING_SECONDS }).getTime() //iat + DURING_SECONDS;
+		const timeClearBadPractice =  add(iat, { seconds: DURING_SECONDS * 2 }).getTime();
 		const currentDate = new Date().getTime();
 
 		const foundedBadPractice = await badPractice.findOne({ ipAddress });
@@ -28,21 +29,17 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 
 		//Founded BadPractice
 		let nextCount = foundedBadPractice.count + 1;
-		// console.log("nextCount: ", nextCount);
-		// console.log(nextCount <= MAX_COUNT);
-		// console.log(nextCount > MAX_COUNT);
 
 		if (nextCount <= MAX_COUNT) { 
 			await badPractice.updateOne({ ipAddress }, { $inc: { count: 1 } });
 			return next();
 		}
 
-		if (nextCount > MAX_COUNT) {
-			// console.log("AAA");
-			await badPractice.deleteOne({ ipAddress });
+		if (nextCount > MAX_COUNT && exp < timeClearBadPractice) {			
 			return res.sendStatus(429);
 		}
 
+		await badPractice.deleteOne({ ipAddress });
 		next();
 	} catch (error) {
 		console.error("Error: VerifyNumberAttempts");
