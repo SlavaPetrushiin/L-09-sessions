@@ -35,11 +35,11 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 			return next();
 		}
 
-		if (nextCount > MAX_COUNT && exp < timeClearBadPractice) {			
+		if (nextCount > MAX_COUNT) {			// && exp < timeClearBadPractice
+			await badPractice.deleteOne({ ipAddress });
 			return res.sendStatus(429);
 		}
 
-		await badPractice.deleteOne({ ipAddress });
 		next();
 	} catch (error) {
 		console.error("Error: VerifyNumberAttempts");
