@@ -12,9 +12,12 @@ import { routerSecurity } from './routers/securityRouter';
 dotenv.config();
 
 export const app = express();
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: true,
+}));
 app.set('trust proxy', true);
-app.use(cookieParser());
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(express.json());
 
 app.use('/auth', routerAuth);
