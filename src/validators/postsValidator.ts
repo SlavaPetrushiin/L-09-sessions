@@ -4,7 +4,6 @@ import { body, CustomValidator  } from "express-validator";
 export const checkBlogID: CustomValidator = async (blogId: string) =>{
 	let foundedBlog = await QueryRepository.getOneBlog(blogId);
 	if(!foundedBlog){
-		console.log("ERROR");
 		return Promise.reject();
 	}
 }
