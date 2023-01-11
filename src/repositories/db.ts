@@ -10,7 +10,7 @@ if(!url){
 }
 
 const client = new MongoClient(url);
-const dbName = "blogsAndPosts";
+const dbName = process.env.DB_NAME;
 export const db = client.db(dbName);
 
 export const blogsCollection = db.collection<ApiTypes.IBlog>("blogs");
