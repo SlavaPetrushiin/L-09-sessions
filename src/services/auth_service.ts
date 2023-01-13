@@ -4,17 +4,30 @@ import { v4 as uuidv4 } from 'uuid';
 import { add } from 'date-fns';
 import { ClientsRepository } from '../repositories/clients-db-repository';
 import { Email } from '../lib/email';
-import { logCollection } from '../repositories/db';
+import { PasswordRecoveryRepository } from '../repositories/password-recovery-repository';
 const bcrypt = require('bcrypt');
 
+type TypeUrlMessage = "registration" | "recoveryCode";
+const URL_TEXT = {
+	registration: {
+		title: "Thank for your registration",
+		text: "To finish registration please follow the link below:",
+		textLink: "complete registration"
+	},
+	recoveryCode: {
+		title: "Password recovery",
+		text: "To finish password recovery please follow the link below:",
+		textLink: "recovery password"
+	}
+}
 
-function getUrlWithCode(url: string, code: string): string {
+function getUrlWithCode(url: string, code: string, typeMessage: TypeUrlMessage): string {
 	return `
-			<h1>Thank for your registration</h1>
-			<p>To finish registration please follow the link below:
-				<a href='https://somesite.com/${url}=${code}'>complete registration</a>
+			<h1>${URL_TEXT[typeMessage].title}</h1>
+			<p>${URL_TEXT[typeMessage].text}
+				<a href='https://somesite.com/${url}=${code}'>${URL_TEXT[typeMessage].textLink}</a>
 		</p>
-	`
+	`;
 }
 
 async function hasPassword(password: string): Promise<string | null> {
@@ -36,7 +49,7 @@ async function comparePassword(password: string, hash: string): Promise<boolean>
 	}
 }
 
-type RegistrationResponse = Omit<ApiTypes.IClientDB, 'hasPassword' | 'emailConfirmation'>  | null;
+type RegistrationResponse = Omit<ApiTypes.IClientDB, 'hasPassword' | 'emailConfirmation'> | null;
 export class AuthService {
 	static async login(loginOrEmail: string, password: string): Promise<ApiTypes.IClientDB | null> {
 		let user = await ClientsRepository.getClientByEmailOrLogin(loginOrEmail);
@@ -85,11 +98,8 @@ export class AuthService {
 		if (!isCreatedClient) {
 			return null;
 		}
-		let url = getUrlWithCode('confirm-email?code', code);
+		let url = getUrlWithCode('confirm-email?code', code, "registration");
 		const isSentEmail = await Email.sendEmail(client.email, url);
-		// if (!isSentEmail) {
-		// 	return null;
-		// }
 
 		return {
 			id: client.id,
@@ -128,7 +138,7 @@ export class AuthService {
 			return null;
 		}
 
-		let url = getUrlWithCode('confirm-registration?code', newCode);
+		let url = getUrlWithCode('confirm-registration?code', newCode, "registration");
 		await Email.sendEmail(client.email, url);
 
 		// if (!isResendingCode) {
@@ -136,5 +146,48 @@ export class AuthService {
 		// }
 
 		return isUpdatedClient;
+	}
+
+	static async passwordRecovery(email: string) {
+		let recoveryCode = uuidv4();
+		let dateExpired = add(new Date(), { hours: 1 })
+		let isCreatedRecovery = await PasswordRecoveryRepository.createPasswordRecovery(recoveryCode, email, dateExpired);
+
+		if (!isCreatedRecovery) {
+			return null;
+		}
+
+		let url = getUrlWithCode('confirm-registration?recoveryCode', recoveryCode, "recoveryCode");
+		await Email.sendEmail(email, url);
+		return isCreatedRecovery;
+	}
+
+	static async updatePassword(newPassword: string, recoveryCode: string): Promise<ModifyResult<ApiTypes.IClientDB> | null> {
+			let foundedRecoveryObject = await PasswordRecoveryRepository.getRecoveryPassword(recoveryCode);
+			if (!foundedRecoveryObject) {
+				return null;
+			}
+			if (new Date() > foundedRecoveryObject.dateExpired) {
+				return null;
+			}
+
+			let user = await ClientsRepository.getClientByEmailOrLogin(foundedRecoveryObject.email);
+			if (!user) {
+				return null;
+			}
+
+			const passwordHash = await hasPassword(newPassword);
+
+			if(!passwordHash){
+				return null;
+			}
+
+			const isUpdatedPassword = await  ClientsRepository.updatePassword(user.id, passwordHash);
+
+			if(!isUpdatedPassword){
+				return null;
+			}
+
+			return isUpdatedPassword
 	}
 }

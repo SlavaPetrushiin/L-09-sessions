@@ -77,6 +77,15 @@ class ClientsRepositoryModel {
 			return null;
 		}
 	}
+
+	public async updatePassword(id: string, newPassword: string):Promise<ModifyResult<ApiTypes.IClientDB> | null>{
+		try {
+			return await clientsCollection.findOneAndUpdate({id}, {$set: {'hasPassword': newPassword}} );
+		} catch (error) {
+			console.error(`ClientsRepositoryModel, Not updateClient: `, error);
+			return null;
+		}
+	}
 }
 
 export const ClientsRepository = new ClientsRepositoryModel();

@@ -1,3 +1,4 @@
+import { emailValidator } from './../validators/usersValidator';
 import { checkBearerAuth } from './../utils/checkBearerAuth';
 import { checkError, checkErrorAuth } from './../utils/checkError';
 import express, { Request, Response } from 'express';
@@ -45,6 +46,24 @@ routerAuth.post('/login', verifyNumberAttempts,   async (req: Request<{}, {}, IL
 
 	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 	return res.status(200).send({ accessToken: tokens.accessToken });
+})
+
+routerAuth.post('/password-recovery', verifyNumberAttempts, emailValidator, checkError,  async (req: Request<{}, {}, {email: string}>, res: Response) => {
+	let email = req.body.email;
+	let result = await AuthService.passwordRecovery(email);
+
+	res.sendStatus(204);
+})
+
+routerAuth.post('/new-password', verifyNumberAttempts, async (req: Request<{}, {}, {newPassword: string, recoveryCode: string }>, res: Response) => {
+	let {newPassword, recoveryCode } = req.body;
+	let isUpdatedPassword = await await AuthService.updatePassword(newPassword, recoveryCode);
+
+	if(!isUpdatedPassword){
+		return res.sendStatus(400);
+	}
+
+	res.sendStatus(204);
 })
 
 routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts,  async (req: Request<{}, {}, IRegistration>, res: Response) => {

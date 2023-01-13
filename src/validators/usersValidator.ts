@@ -33,3 +33,7 @@ export const userValidator = [
 		.custom(checkEmailOrLogin)
 		.withMessage("Пользователь с таким email существует"),
 ];
+
+export const emailValidator = [
+	body("email").isString().isEmail()
+]

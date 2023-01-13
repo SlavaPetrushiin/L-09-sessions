@@ -10,7 +10,7 @@ if(!url){
 }
 
 const client = new MongoClient(url);
-const dbName = process.env.DB_NAME;
+const dbName = "blogsAndPosts" //process.env.DB_NAME;
 export const db = client.db(dbName);
 
 export const blogsCollection = db.collection<ApiTypes.IBlog>("blogs");
@@ -20,6 +20,7 @@ export const clientsCollection = db.collection<ApiTypes.IClientDB>("clients");
 export const refreshTokensCollection = db.collection<ApiTypes.IRefreshToken>("refreshToken");
 export const authDevicesSessions = db.collection<ApiTypes.IAuthDevicesSessions>('authDevicesSessions');
 export const badPractice = db.collection<ApiTypes.IBadPractice>("badPractice");
+export const passwordRecovery = db.collection<ApiTypes.IPasswordRecovery>("passwordRecovery");
 export const logCollection = db.collection<any>('logs');
 
 export async function runDB(){

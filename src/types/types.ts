@@ -91,4 +91,10 @@ export namespace ApiTypes {
 		// iat: number;
 		// exp: number;
 	}
+
+	export interface IPasswordRecovery{
+	email: string;
+  recoveryCode: string;
+	dateExpired: Date;
+	}
 }
