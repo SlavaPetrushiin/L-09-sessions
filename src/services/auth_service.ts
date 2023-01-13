@@ -157,7 +157,7 @@ export class AuthService {
 			return null;
 		}
 
-		let url = getUrlWithCode('confirm-registration?recoveryCode', recoveryCode, "recoveryCode");
+		let url = getUrlWithCode('password-recovery?recoveryCode', recoveryCode, "recoveryCode");
 		await Email.sendEmail(email, url);
 		return isCreatedRecovery;
 	}
