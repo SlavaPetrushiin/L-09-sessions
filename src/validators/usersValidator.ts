@@ -37,3 +37,7 @@ export const userValidator = [
 export const emailValidator = [
 	body("email").isString().isEmail()
 ]
+
+export const passwordValidator = [
+	body("newPassword").isString().isLength({ min: 6, max: 20 }).withMessage("Пароль должен быть от 6 до 20 символов")
+]

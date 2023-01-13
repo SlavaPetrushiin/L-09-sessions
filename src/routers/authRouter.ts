@@ -1,4 +1,4 @@
-import { emailValidator } from './../validators/usersValidator';
+import { emailValidator, passwordValidator } from './../validators/usersValidator';
 import { checkBearerAuth } from './../utils/checkBearerAuth';
 import { checkError, checkErrorAuth } from './../utils/checkError';
 import express, { Request, Response } from 'express';
@@ -55,7 +55,7 @@ routerAuth.post('/password-recovery', verifyNumberAttempts, emailValidator, chec
 	res.sendStatus(204);
 })
 
-routerAuth.post('/new-password', verifyNumberAttempts, async (req: Request<{}, {}, {newPassword: string, recoveryCode: string }>, res: Response) => {
+routerAuth.post('/new-password', verifyNumberAttempts, passwordValidator, checkError,  async (req: Request<{}, {}, {newPassword: string, recoveryCode: string }>, res: Response) => {
 	let {newPassword, recoveryCode } = req.body;
 	let isUpdatedPassword = await await AuthService.updatePassword(newPassword, recoveryCode);
 
