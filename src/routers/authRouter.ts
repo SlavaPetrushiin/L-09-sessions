@@ -29,13 +29,13 @@ routerAuth.get('/me', checkBearerAuth, async (req: Request<{}, {}, ILogin>, res:
 	res.send(user);
 })
 
-routerAuth.post('/login', verifyNumberAttempts,   async (req: Request<{}, {}, ILogin>, res: Response) => {
+routerAuth.post('/login', verifyNumberAttempts, async (req: Request<{}, {}, ILogin>, res: Response) => {
 	const { loginOrEmail, password } = req.body;
 	const ipAddress = req.ip;
-	const title = req.headers['user-agent'] || "";	
+	const title = req.headers['user-agent'] || "";
 	let user = await AuthService.login(loginOrEmail, password);
 	if (!user) {
-		return res.sendStatus(401);		
+		return res.sendStatus(401);
 	}
 
 	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress, title);
@@ -48,25 +48,32 @@ routerAuth.post('/login', verifyNumberAttempts,   async (req: Request<{}, {}, IL
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
-routerAuth.post('/password-recovery', verifyNumberAttempts, emailValidator, checkError,  async (req: Request<{}, {}, {email: string}>, res: Response) => {
+routerAuth.post('/password-recovery', verifyNumberAttempts, emailValidator, checkError, async (req: Request<{}, {}, { email: string }>, res: Response) => {
 	let email = req.body.email;
 	let result = await AuthService.passwordRecovery(email);
 
 	res.sendStatus(204);
 })
 
-routerAuth.post('/new-password', verifyNumberAttempts, passwordValidator, checkError,  async (req: Request<{}, {}, {newPassword: string, recoveryCode: string }>, res: Response) => {
-	let {newPassword, recoveryCode } = req.body;
+routerAuth.post('/new-password', verifyNumberAttempts, passwordValidator, checkError, async (req: Request<{}, {}, { newPassword: string, recoveryCode: string }>, res: Response) => {
+	let { newPassword, recoveryCode } = req.body;
 	let isUpdatedPassword = await await AuthService.updatePassword(newPassword, recoveryCode);
 
-	if(!isUpdatedPassword){
-		return res.sendStatus(400);
+	if (!isUpdatedPassword) {
+		return res.status(400).send({
+			"errorsMessages": [
+				{
+					"field": "newPassword",
+					"message": "Обновите код"
+				}
+			]
+		});
 	}
 
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts,  async (req: Request<{}, {}, IRegistration>, res: Response) => {
+routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts, async (req: Request<{}, {}, IRegistration>, res: Response) => {
 	let { login, password, email } = req.body;
 	let result = await AuthService.registration(login, email, password);
 
@@ -78,7 +85,7 @@ routerAuth.post('/registration', userValidator, checkError, verifyNumberAttempts
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration-confirmation', verifyNumberAttempts,  async (req: Request<{}, {}, { code: string }>, res: Response) => {
+routerAuth.post('/registration-confirmation', verifyNumberAttempts, async (req: Request<{}, {}, { code: string }>, res: Response) => {
 	let { code } = req.body;
 	let result = await AuthService.confirmCode(code);
 	if (!result) {
@@ -96,7 +103,7 @@ routerAuth.post('/registration-confirmation', verifyNumberAttempts,  async (req:
 	res.sendStatus(204);
 })
 
-routerAuth.post('/registration-email-resending', verifyNumberAttempts,  async (req: Request<{}, {}, { email: string }>, res: Response) => {
+routerAuth.post('/registration-email-resending', verifyNumberAttempts, async (req: Request<{}, {}, { email: string }>, res: Response) => {
 	let { email } = req.body;
 	let result = await AuthService.confirmResending(email);
 
@@ -115,15 +122,15 @@ routerAuth.post('/registration-email-resending', verifyNumberAttempts,  async (r
 	res.sendStatus(204);
 })
 
-routerAuth.post('/refresh-token', verifyRefreshToken,  async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
+routerAuth.post('/refresh-token', verifyRefreshToken, async (req: Request<{}, {}, { accessToken: string }>, res: Response) => {
 	let authSession = req.authDeviceSession;
 	let isUpdatedTokens = await ServiceJWT.updateSessionWithToken(authSession);
 	if (!isUpdatedTokens) {
 		return res.sendStatus(401);
 	}
 
-	return  res
-		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true,  maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
+	return res
+		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 		.status(200)
 		.send({ accessToken: isUpdatedTokens.accessToken });
 })
