@@ -63,7 +63,7 @@ routerAuth.post('/new-password', verifyNumberAttempts, passwordValidator, checkE
 		return res.status(400).send({
 			"errorsMessages": [
 				{
-					"field": "newPassword",
+					"field": "recoveryCode",
 					"message": "Обновите код"
 				}
 			]
