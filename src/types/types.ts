@@ -87,9 +87,6 @@ export namespace ApiTypes {
 		ip: string;
 		connectionUrl: string,
 		connectionDate: Date
-		// count: number;
-		// iat: number;
-		// exp: number;
 	}
 
 	export interface IPasswordRecovery{
