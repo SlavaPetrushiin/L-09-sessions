@@ -5,8 +5,8 @@ import { postsCollection } from "./db";
 class PostRepositoryModel {
 	public async createPost(post: ApiTypes.IPost): Promise<ApiTypes.IPost | boolean> {
 		try {
-			let result = await postsCollection.insertOne(post);
-			return result.acknowledged;
+			let result = await postsCollection.create(post);
+			return !!result;
 		} catch (error) {
 			console.error(error);
 			return false;

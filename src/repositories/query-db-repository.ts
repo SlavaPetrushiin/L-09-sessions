@@ -41,7 +41,7 @@ export class QueryRepository {
 				.skip(+skip)
 				.limit(+pageSize)
 				.sort({ [sortBy]: sortDirection == "asc" ? 1 : -1 })
-				.toArray();
+				//.toArray();
 
 			let totalCount = await blogsCollection.countDocuments({ name: { $regex: searchNameTerm, $options: "$i" } });
 			let pageCount = Math.ceil(totalCount / +pageSize);
@@ -85,7 +85,7 @@ export class QueryRepository {
 				.skip(+skip)
 				.limit(+pageSize)
 				.sort({ [sortBy]: sortDirection == "asc" ? 1 : -1 })
-				.toArray();
+				//.toArray();
 
 			let totalCount = await postsCollection.countDocuments(filter, {});
 			let pageCount = Math.ceil(totalCount / +pageSize);
@@ -140,7 +140,7 @@ export class QueryRepository {
 				.skip(skip)
 				.limit(+pageSize)
 				.sort({ [sortBy]: sortDirection == "asc" ? 1 : -1 })
-				.toArray();
+				//.toArray();
 
 			let totalCount = await clientsCollection.countDocuments({
 				$or: [
@@ -165,7 +165,7 @@ export class QueryRepository {
 
 	static async getComments(): Promise<ApiTypes.ICommentModel[] | null> {
 		try {
-			return await commentsCollection.find({}, { projection: { ...DEFAULT_PROJECTION, postId: false } }).toArray();
+			return await commentsCollection.find({}, { projection: { ...DEFAULT_PROJECTION, postId: false } });
 		} catch (error) {
 			console.error(error);
 			return null;
@@ -193,7 +193,7 @@ export class QueryRepository {
 				.skip(skip)
 				.limit(+pageSize)
 				.sort({ [sortBy]: sortDirection == "asc" ? 1 : -1 })
-				.toArray();
+				//.toArray();
 
 			let totalCount = await commentsCollection.countDocuments({ postId })
 			let pageCount = Math.ceil(totalCount / +pageSize);

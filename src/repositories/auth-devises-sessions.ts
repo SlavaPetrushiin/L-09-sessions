@@ -10,8 +10,8 @@ interface IPramsForUpdateRefreshToken {
 class AuthDevicesSessions {
 	public async createSession(dataSession: ApiTypes.IAuthDevicesSessions): Promise<boolean> {
 		try {
-			let result = await authDevicesSessions.insertOne(dataSession);
-			return result.acknowledged;
+			let result = await authDevicesSessions.create(dataSession);
+			return !!result;
 		} catch (error) {
 			console.error(`Error => Not create Session: ${dataSession}`);
 			return false;
@@ -29,7 +29,7 @@ class AuthDevicesSessions {
 
 	public async getSessions(userId: string): Promise<ApiTypes.IAuthDevicesSessions[] | null> {
 		try {
-			return authDevicesSessions.find({ userId}, { projection: { _id: false,  exp: false, userId: false } }).toArray();
+			return authDevicesSessions.find({ userId}, { projection: { _id: false,  exp: false, userId: false } });
 		} catch (error) {
 			console.error(`Error => Not Sessions for userId: ${userId}`);
 			return null;

@@ -3,8 +3,8 @@ import { blogsCollection } from "./db";
 class BlogsRepositoryModel {
 	public async createBlog(blog: ApiTypes.IBlog): Promise<boolean> {
 		try {
-			let result = await blogsCollection.insertOne(blog);
-			return result.acknowledged;
+			let result = await blogsCollection.create(blog);
+			return !!result;
 		} catch (error) {
 			console.error(error);
 			return false;

@@ -5,8 +5,8 @@ import { clientsCollection } from "./db";
 class ClientsRepositoryModel {
 	public async createClient(user: ApiTypes.IClientDB): Promise<boolean> {
 		try {
-			let result = await clientsCollection.insertOne(user);
-			return result.acknowledged;
+			let result = await clientsCollection.create(user);
+			return !!result;
 		} catch (error) {
 			return false;
 		}

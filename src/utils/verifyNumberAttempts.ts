@@ -18,7 +18,7 @@ export const verifyNumberAttempts = async (req: Request, res: Response, next: Ne
 			return res.sendStatus(429);
 		}
 		
-		await badPractice.insertOne({ ip, connectionUrl, connectionDate });
+		await badPractice.create({ ip, connectionUrl, connectionDate });
 		return next();
 	} catch (error) {
 		console.error("Error: VerifyNumberAttempts");

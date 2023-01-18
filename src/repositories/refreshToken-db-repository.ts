@@ -4,8 +4,8 @@ import { refreshTokensCollection } from "./db";
 class RefreshTokenModel {
 	public async addRefreshToken(refreshToken: ApiTypes.IRefreshToken):Promise<boolean>{
 		try {
-			let result = await refreshTokensCollection.insertOne(refreshToken);
-			return result.acknowledged;
+			let result = await refreshTokensCollection.create(refreshToken);
+			return !!result;
 		} catch (error) {
 			console.error('Not create RefreshToken');
 			return false;
