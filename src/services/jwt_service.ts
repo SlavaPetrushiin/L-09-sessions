@@ -41,7 +41,7 @@ export class ServiceJWT {
 				userId: userId,
 			}
 			const result = await AuthSessionsRepository.createSession(authDeviceSession);
-			logCollection.insertOne({...authDeviceSession, result});
+			logCollection.create({...authDeviceSession, result});
 
 			if (!result) {
 				return null;
