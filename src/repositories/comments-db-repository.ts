@@ -1,7 +1,7 @@
 import { ApiTypes } from "../types/types";
 import { commentsCollection } from "./db";
 
-class CommentsRepositoryModel {
+export class CommentsRepository {
 	public async createComments(comment: ApiTypes.ICommentModel): Promise<boolean> {
 		try {
 			let result = await commentsCollection.create(comment);
@@ -47,6 +47,3 @@ class CommentsRepositoryModel {
 		}
 	}
 }
-
-export const CommentsRepository = new CommentsRepositoryModel();
-

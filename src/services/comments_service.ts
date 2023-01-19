@@ -1,7 +1,6 @@
-import { commentsCollection } from './../repositories/db';
-import { CommentsRepository } from './../repositories/comments-db-repository';
 import { QueryRepository } from './../repositories/query-db-repository';
 import { ApiTypes } from "../types/types";
+import { CommentsRepository } from '../repositories/comments-db-repository';
 
 interface ICreatePost {
 	email: string;
@@ -10,7 +9,13 @@ interface ICreatePost {
 }
 
 export class CommentsService {
-	static async createComments(user: ICreatePost, comment: string, postId: string) {
+	CommentsRepository: CommentsRepository
+
+	constructor(){
+		this.CommentsRepository = new CommentsRepository();
+	}
+
+	public async createComments(user: ICreatePost, comment: string, postId: string) {
 		const newComments: ApiTypes.ICommentModel = {
 			id: (new Date().getMilliseconds()).toString(),
 			content: comment,
@@ -19,7 +24,7 @@ export class CommentsService {
 			createdAt: new Date().toISOString(),
 			postId
 		}
-		let result = await CommentsRepository.createComments(newComments);
+		let result = await this.CommentsRepository.createComments(newComments);
 
 		return result
 			? {
@@ -32,7 +37,7 @@ export class CommentsService {
 			: false;
 	}
 
-	static async updateComment(commentId: string, content: string, user: { email: string; login: string; userId: string; }) {
+	public async updateComment(commentId: string, content: string, user: { email: string; login: string; userId: string; }) {
 		let comment = await QueryRepository.getOneComment(commentId);
 
 		if (!comment) {
@@ -41,15 +46,15 @@ export class CommentsService {
 
 		comment.content = content;
 
-		let isUpdatedComment = await CommentsRepository.updateComments(comment);
+		let isUpdatedComment = await this.CommentsRepository.updateComments(comment);
 		return isUpdatedComment;
 	}
 
-	static async deleteComment(commentId: string) {
-		return CommentsRepository.deleteComment(commentId);
+	public async deleteComment(commentId: string) {
+		return this.CommentsRepository.deleteComment(commentId);
 	}
 
-	static async deleteAllComments() {
-		return CommentsRepository.deleteAllComments();
+	public async deleteAllComments() {
+		return this.CommentsRepository.deleteAllComments();
 	}
 }

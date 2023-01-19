@@ -6,6 +6,10 @@ import { createAndUpdatePostsValidator } from '../validators/postsValidator';
 import { PostService } from '../services/posts_service';
 import { checkQueryPostsAndBlogs, IQueryBlogsAndPosts } from '../utils/checkQueryPostsAndBlogs';
 import { QueryRepository } from '../repositories/query-db-repository';
+import { checkQueryCommentsByPostID } from '../utils/checkQueryCommentsByPostID';
+import { commentsController } from '../controllers/CommentsController';
+import { checkBearerAuth } from '../utils/checkBearerAuth';
+import { commentValidator } from '../validators/commentValidator';
 
 export const routerPosts = express.Router();
 
@@ -61,3 +65,17 @@ routerPosts.delete('/:id', checkBasicAuth, async (req: Request<{id: string}>, re
 
 	res.sendStatus(204);
 })
+
+routerPosts.get(
+	'/:postId/comments',
+	checkQueryCommentsByPostID,
+	commentsController.getCommentByPostId.bind(commentsController)
+);
+
+routerPosts.post(
+	'/:postId/comments',
+	checkBearerAuth,
+	commentValidator,
+	checkError,
+	commentsController.createCommentByPostId.bind(commentsController)
+);
