@@ -69,8 +69,8 @@ routerPosts.delete('/:id', checkBasicAuth, async (req: Request<{id: string}>, re
 
 routerPosts.get(
 	'/:postId/comments',
-	checkQueryCommentsByPostID,
 	checkAccessToken,
+	checkQueryCommentsByPostID,
 	commentsController.getCommentByPostId.bind(commentsController)
 );
 

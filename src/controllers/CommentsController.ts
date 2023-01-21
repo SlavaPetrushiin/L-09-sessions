@@ -77,7 +77,7 @@ export class CommentsController {
 		let { postId } = req.params;
 		let { pageNumber, pageSize, sortBy, sortDirection } = req.query;
 		let user = req.user;
-		console.log("user: ", user);
+		let userId = user ? user.userId : "";
 	
 		let foundedPost = await QueryRepository.getOnePost(postId);
 	
@@ -88,7 +88,7 @@ export class CommentsController {
 		let comments = await QueryRepository.getCommentsByPostID({ pageNumber: pageNumber!, pageSize: pageSize!, sortBy: sortBy!, sortDirection: sortDirection! }, postId);
 		let preparedComments = {
 			...comments,
-			items: comments?.items.map(comment => this.CommentsService.countingLikesOrDislikes(comment))
+			items: comments?.items.map(comment => this.CommentsService.countingLikesOrDislikes(comment, userId))
 		}
 		res.status(200).send(preparedComments);
 	}
