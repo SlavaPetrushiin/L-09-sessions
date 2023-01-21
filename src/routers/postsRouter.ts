@@ -1,3 +1,4 @@
+import { checkAccessToken } from './../utils/checkAccessToken';
 import { checkBasicAuth } from '../utils/checkBasicAuth';
 import express, {Request, Response} from 'express';
 import { ApiTypes } from '../types/types';
@@ -69,6 +70,7 @@ routerPosts.delete('/:id', checkBasicAuth, async (req: Request<{id: string}>, re
 routerPosts.get(
 	'/:postId/comments',
 	checkQueryCommentsByPostID,
+	checkAccessToken,
 	commentsController.getCommentByPostId.bind(commentsController)
 );
 

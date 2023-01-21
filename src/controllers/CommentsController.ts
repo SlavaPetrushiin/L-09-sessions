@@ -76,6 +76,8 @@ export class CommentsController {
 	async getCommentByPostId(req: Request<{ postId: string }, {}, {}, ICommentsByPostID>, res: Response) {
 		let { postId } = req.params;
 		let { pageNumber, pageSize, sortBy, sortDirection } = req.query;
+		let user = req.user;
+		console.log("user: ", user);
 	
 		let foundedPost = await QueryRepository.getOnePost(postId);
 	
@@ -116,7 +118,7 @@ export class CommentsController {
 		const likeStatus =  req.body.likeStatus;
 		const commentId = req.params.commentId;
 		const {userId} = req.user!;
-		const result = this.CommentsService.addLikeOrDislikeFactory({likeStatus, commentId, userId})
+		const result = await this.CommentsService.addLikeOrDislikeFactory({likeStatus, commentId, userId})
 
 		if(!result){
 			return res.sendStatus(404);

@@ -94,7 +94,7 @@ export class CommentsService {
 	public async addLikeOrDislikeFactory(paramsLike: IParamsLikeOrDislike): Promise<ApiTypes.ICommentModel | null> {
 		let { likeStatus, commentId, userId } = paramsLike;
 		let foundedComment = await QueryRepository.getOneComment(commentId);
-
+		console.log("foundedComment: ", foundedComment);
 		if (!foundedComment) {
 			return null;
 		}
