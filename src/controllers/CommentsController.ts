@@ -1,13 +1,14 @@
 import { QueryRepository } from './../repositories/query-db-repository';
-import { CommentsService } from './../services/comments_service';
+import { CommentsService, IViewCommentModel } from './../services/comments_service';
 import  { Request, Response } from 'express';
 import {  ICommentsByPostID } from '../utils/checkQueryCommentsByPostID';
+import { dictionary as D } from '../types/dictionary';
 
 export class CommentsController {
 	CommentsService: CommentsService;
 
 	constructor() {
-		this.CommentsService = new CommentsService()
+		this.CommentsService = new CommentsService();
 	}
 
 	async getComments(req: Request<{ id: string }>, res: Response) {
@@ -18,13 +19,14 @@ export class CommentsController {
 		res.send(comments);
 	}
 
-	async getComment(req: Request<{ id: string }>, res: Response) {
+	async getComment(req: Request<{ id: string }>, res: Response)  {
 		let id = req.params.id;
 		let comment = await QueryRepository.getOneComment(id);
 		if (!comment) {
-			return res.sendStatus(404)
+			return res.sendStatus(404);
 		}
-		res.send(comment);
+		let preparedComment =  this.CommentsService.countingLikesOrDislikes(comment);
+		res.send(preparedComment);
 	}
 
 	async updateComment(req: Request<{ commentId: string }, {}, { content: string }>, res: Response){
@@ -82,8 +84,11 @@ export class CommentsController {
 		}
 	
 		let comments = await QueryRepository.getCommentsByPostID({ pageNumber: pageNumber!, pageSize: pageSize!, sortBy: sortBy!, sortDirection: sortDirection! }, postId);
-	
-		res.status(200).send(comments);
+		let preparedComments = {
+			...comments,
+			items: comments?.items.map(comment => this.CommentsService.countingLikesOrDislikes(comment))
+		}
+		res.status(200).send(preparedComments);
 	}
 
 	async createCommentByPostId (req: Request<{ postId: string }, {}, { content: string }>, res: Response) {
@@ -105,6 +110,19 @@ export class CommentsController {
 	
 	
 		res.status(201).send(createdComment);
+	}
+
+	async addLikeOrDislike(req: Request<{commentId: string}, {}, {likeStatus: D.StatusLike}>, res: Response){
+		const likeStatus =  req.body.likeStatus;
+		const commentId = req.params.commentId;
+		const {userId} = req.user!;
+		const result = this.CommentsService.addLikeOrDislikeFactory({likeStatus, commentId, userId})
+
+		if(!result){
+			return res.sendStatus(404);
+		}
+
+		return res.sendStatus(204);		
 	}
 }
 

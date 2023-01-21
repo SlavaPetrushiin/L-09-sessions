@@ -2,20 +2,22 @@ import { ApiTypes } from "../types/types";
 import { commentsCollection } from "./db";
 
 export class CommentsRepository {
-	public async createComments(comment: ApiTypes.ICommentModel): Promise<boolean> {
+	public async createComments(comment: ApiTypes.ICommentModel): Promise<ApiTypes.ICommentModel | null> {
 		try {
+			console.log("comment: ", comment);
 			let result = await commentsCollection.create(comment);
-			return !!result;
+			console.log(result);
+			return result;
 		} catch (error) {
 			console.error(error);
-			return false;
+			return null;
 		}
 	}
 
 	public async updateComments(comment: ApiTypes.ICommentModel): Promise<boolean> {
 		try {
 
-			let result = await commentsCollection.updateOne({ id: comment.id }, { $set: { content: comment.content }});
+			let result = await commentsCollection.updateOne({ id: comment.id }, { $set: { content: comment.content } });
 
 			if (result.matchedCount == 0) {
 				return false;
@@ -44,6 +46,19 @@ export class CommentsRepository {
 			return result.deletedCount > 0 ? true : false;
 		} catch (error) {
 
+		}
+	}
+
+	public async updateLikeOrDislike(comment: ApiTypes.ICommentModel): Promise<ApiTypes.ICommentModel | null> {
+		try {
+			return commentsCollection.findOneAndUpdate(
+				{ id: comment.id },
+				{ likes: comment.likes, dislikes: comment.dislikes },
+				{ new: true }
+			).lean();
+		} catch (error) {
+			console.error(`NOt saved like/dislike. Method: updateLikeOrDislike. Text error: ${error}`);
+			return null;
 		}
 	}
 }

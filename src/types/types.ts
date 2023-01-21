@@ -54,6 +54,8 @@ export namespace ApiTypes {
 		userLogin: string;
 		createdAt: string;
 		postId: string;
+		likes: string[];
+		dislikes: string[];
 	}
 
 	export interface IClientDB {
