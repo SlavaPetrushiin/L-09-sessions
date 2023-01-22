@@ -45,7 +45,7 @@ routerAuth.post('/login', verifyNumberAttempts, async (req: Request<{}, {}, ILog
 		return res.sendStatus(401);
 	}
 
-	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS,  })//secure: true
+	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS,  secure: true})//
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
