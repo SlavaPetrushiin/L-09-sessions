@@ -39,12 +39,13 @@ routerAuth.post('/login', verifyNumberAttempts, async (req: Request<{}, {}, ILog
 	}
 
 	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress, title);
+	console.log(tokens);
 
 	if (!tokens) {
 		return res.sendStatus(401);
 	}
 
-	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
+	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS,  })//secure: true
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
@@ -136,9 +137,10 @@ routerAuth.post('/refresh-token', verifyRefreshToken, async (req: Request<{}, {}
 })
 
 routerAuth.post('/logout', verifyRefreshToken, async (req: Request, res: Response) => {
+	console.log("AAAAAAAA");
 	let authSession = req.authDeviceSession;
 	let isLogout = await ServiceJWT.removeRefreshToken(authSession);
-
+	console.log("isLogout: ", isLogout)
 	if (!isLogout) {
 		return res.sendStatus(401);
 	}

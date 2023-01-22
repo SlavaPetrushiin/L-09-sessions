@@ -17,7 +17,7 @@ app.use(cors({
   origin: true,
 }));
 app.set('trust proxy', true);
-app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser());//process.env.COOKIE_SECRET
 app.use(express.json());
 
 app.use('/auth', routerAuth);

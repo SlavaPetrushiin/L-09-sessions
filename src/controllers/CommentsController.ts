@@ -16,7 +16,8 @@ export class CommentsController {
 		if (!comments) {
 			return res.sendStatus(404);
 		}
-		res.send(comments);
+		let preparedComment = comments.map(comment => this.CommentsService.countingLikesOrDislikes(comment))  ;
+		res.send(preparedComment);
 	}
 
 	async getComment(req: Request<{ id: string }>, res: Response)  {
