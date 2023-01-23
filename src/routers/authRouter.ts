@@ -1,13 +1,12 @@
 import { emailValidator, passwordValidator } from './../validators/usersValidator';
 import { checkBearerAuth } from './../utils/checkBearerAuth';
-import { checkError, checkErrorAuth } from './../utils/checkError';
+import { checkError } from './../utils/checkError';
 import express, { Request, Response } from 'express';
-import { loginValidator, userValidator } from '../validators/usersValidator';
+import { userValidator } from '../validators/usersValidator';
 import { ServiceJWT } from '../services/jwt_service';
 import { AuthService } from '../services/auth_service';
 import { verifyRefreshToken } from '../utils/verifyRefreshToken';
 import { verifyNumberAttempts } from '../utils/verifyNumberAttempts';
-import { logCollection } from '../repositories/db';
 export const routerAuth = express.Router();
 
 interface ILogin {
@@ -45,13 +44,13 @@ routerAuth.post('/login', verifyNumberAttempts, async (req: Request<{}, {}, ILog
 		return res.sendStatus(401);
 	}
 
-	res.cookie('refreshToken', tokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS,  secure: true})//
+	res.cookie('refreshToken', tokens.refreshToken, { maxAge: MAX_AGE_COOKIE_MILLISECONDS, httpOnly: true, secure: true })//secure: true httpOnly: true
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })
 
 routerAuth.post('/password-recovery', verifyNumberAttempts, emailValidator, checkError, async (req: Request<{}, {}, { email: string }>, res: Response) => {
 	let email = req.body.email;
-	let result = await AuthService.passwordRecovery(email);
+	await AuthService.passwordRecovery(email);
 
 	res.sendStatus(204);
 })
@@ -131,16 +130,14 @@ routerAuth.post('/refresh-token', verifyRefreshToken, async (req: Request<{}, {}
 	}
 
 	return res
-		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 		.status(200)
+		.cookie('refreshToken', isUpdatedTokens.refreshToken, { httpOnly: true, maxAge: MAX_AGE_COOKIE_MILLISECONDS, secure: true })
 		.send({ accessToken: isUpdatedTokens.accessToken });
 })
 
 routerAuth.post('/logout', verifyRefreshToken, async (req: Request, res: Response) => {
-	console.log("AAAAAAAA");
 	let authSession = req.authDeviceSession;
 	let isLogout = await ServiceJWT.removeRefreshToken(authSession);
-	console.log("isLogout: ", isLogout)
 	if (!isLogout) {
 		return res.sendStatus(401);
 	}

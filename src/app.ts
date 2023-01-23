@@ -1,3 +1,5 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { routerAuth } from './routers/authRouter';
 import { routerUsers } from './routers/usersRouter';
 import express, { Request, Response, NextFunction } from 'express';
@@ -7,17 +9,17 @@ import { routerPosts } from './routers/postsRouter';
 import { routerComments } from './routers/commentsRouter';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import * as dotenv from 'dotenv';
 import { routerSecurity } from './routers/securityRouter';
-dotenv.config();
 
-export const app = express();
+
+const app = express();
 app.use(cors({
   credentials: true,
   origin: true,
 }));
 app.set('trust proxy', true);
-app.use(cookieParser());//process.env.COOKIE_SECRET
+//app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(cookieParser());
 app.use(express.json());
 
 app.use('/auth', routerAuth);
@@ -52,3 +54,5 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.status(500);
   res.send('500 - Ошибка сервера');
 })
+
+export default app

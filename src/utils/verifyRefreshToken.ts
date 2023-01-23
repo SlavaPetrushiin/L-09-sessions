@@ -10,9 +10,8 @@ import { ClientsRepository } from '../repositories/clients-db-repository';
 export const verifyRefreshToken = async (req: Request<{}, {}, { accessToken: string }>, res: Response, next: NextFunction) => {
 	try {
 		let refreshToken = req.cookies.refreshToken;
-		console.log("DDDDDDDDDDDD: ", refreshToken);
-
-
+		console.log("cookies: ", req.cookies);
+		console.log("cookies refreshToken: ", refreshToken);
 		if (!refreshToken) {
 			return res.sendStatus(401);
 		};
