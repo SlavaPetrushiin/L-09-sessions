@@ -94,7 +94,6 @@ export class CommentsService {
 	public async addLikeOrDislikeFactory(paramsLike: IParamsLikeOrDislike): Promise<ApiTypes.ICommentModel | null> {
 		let { likeStatus, commentId, userId } = paramsLike;
 		let foundedComment = await QueryRepository.getOneComment(commentId);
-		console.log("foundedComment: ", foundedComment);
 		if (!foundedComment) {
 			return null;
 		}
@@ -155,11 +154,9 @@ export class Likes {
 	async addLike(comment: ApiTypes.ICommentModel, userID: string) {
 		comment.dislikes = comment.dislikes.filter(id => id != userID);
 
-		if (comment.likes.includes(userID)) {
-			comment.likes = comment.likes.filter(id => id != userID);
-		} else {
+		if (!comment.likes.includes(userID)) {
 			comment.likes.push(userID);
-		}
+		} 
 
 		return this.repository.updateLikeOrDislike(comment);
 	}
@@ -167,11 +164,10 @@ export class Likes {
 	async addDislike(comment: ApiTypes.ICommentModel, userID: string) {
 		comment.likes = comment.likes.filter(id => id != userID);
 
-		if (comment.dislikes.includes(userID)) {
-			comment.dislikes = comment.dislikes.filter(id => id != userID);
-		} else {
+		if (!comment.dislikes.includes(userID)) {
 			comment.dislikes.push(userID);
-		}
+		} 
+		
 		return this.repository.updateLikeOrDislike(comment);
 	}
 
