@@ -22,11 +22,12 @@ export class CommentsController {
 
 	async getComment(req: Request<{ id: string }>, res: Response)  {
 		let id = req.params.id;
+		let userId = req.userId;
 		let comment = await QueryRepository.getOneComment(id);
 		if (!comment) {
 			return res.sendStatus(404);
 		}
-		let preparedComment =  this.CommentsService.countingLikesOrDislikes(comment);
+		let preparedComment =  this.CommentsService.countingLikesOrDislikes(comment, userId);
 		res.send(preparedComment);
 	}
 

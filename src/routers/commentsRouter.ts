@@ -1,3 +1,4 @@
+import { getUserIdByAccessToken } from './../utils/getUserIdByAccessToken';
 import { checkError } from './../utils/checkError';
 import { checkBearerAuth } from './../utils/checkBearerAuth';
 import express from 'express';
@@ -14,6 +15,7 @@ routerComments.get(
 
 routerComments.get(
 	'/:id',
+	getUserIdByAccessToken,
 	commentsController.getComment.bind(commentsController)
 );
 
