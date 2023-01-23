@@ -1,4 +1,4 @@
-import { getUserByCookie } from './../utils/checkAccessToken';
+import { getUserIdByAccessToken } from '../utils/getUserIdByAccessToken';
 import { checkBasicAuth } from '../utils/checkBasicAuth';
 import express, {Request, Response} from 'express';
 import { ApiTypes } from '../types/types';
@@ -69,7 +69,7 @@ routerPosts.delete('/:id', checkBasicAuth, async (req: Request<{id: string}>, re
 
 routerPosts.get(
 	'/:postId/comments',
-	getUserByCookie,
+	getUserIdByAccessToken,
 	checkQueryCommentsByPostID,
 	commentsController.getCommentByPostId.bind(commentsController)
 );

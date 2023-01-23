@@ -115,23 +115,23 @@ export class CommentsService {
 		}
 	}
 
-	public countingLikesOrDislikes(comment: ApiTypes.ICommentModel, userID: string = ""): IViewCommentModel { //TODO NAME!!!!
+	public countingLikesOrDislikes(comment: ApiTypes.ICommentModel, userID: string | null = null): IViewCommentModel { //TODO NAME!!!!
 		let userStatus = D.StatusLike.None;
 		let isStatusLike = comment.likes.find(id => id == userID);
 		let isStatusDislike = comment.dislikes.find(id => id == userID);
 
-		if(isStatusLike){
+		if (isStatusLike) {
 			userStatus = D.StatusLike.Like;
 		}
 
-		if(isStatusDislike){
+		if (isStatusDislike) {
 			userStatus = D.StatusLike.Dislike;
 		}
-
+	
 		let likesInfo: ILikesInfo = {
 			dislikesCount: comment.dislikes.length,
 			likesCount: comment.likes.length,
-			myStatus: D.StatusLike.None
+			myStatus: userStatus
 		};
 
 		return {

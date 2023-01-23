@@ -5,7 +5,7 @@ declare global {
 		export interface Request {
 			user: { email: string; login: string; userId: string; } | null;
 			authDeviceSession: ApiTypes.IAuthDevicesSessions;
-			userId: string;
+			userId: string | null;
 		}
 	}
 }
