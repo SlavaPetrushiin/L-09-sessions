@@ -1,3 +1,4 @@
+import { LikesModel } from './repositories/schemas/LikesSchema';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { routerAuth } from './routers/authRouter';
@@ -34,11 +35,12 @@ app.use("/testing/all-data", async (req: Request, res: Response) => {
   const p = postsCollection.deleteMany({});
   const u = clientsCollection.deleteMany({});
   const c = commentsCollection.deleteMany({});
-  const s = authDevicesSessions.deleteMany({})
-  const bp = badPractice.deleteMany({})
+  const s = authDevicesSessions.deleteMany({});
+  const bp = badPractice.deleteMany({});
+  const l = LikesModel.deleteMany({});
   //const l = logCollection.deleteMany({});
 
-  await Promise.all([b, p, u, c,  s, bp]);
+  await Promise.all([b, p, u, c,  s, bp, l]);
 	res.sendStatus(204);
 })
 
