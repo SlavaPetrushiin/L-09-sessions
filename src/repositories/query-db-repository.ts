@@ -27,7 +27,7 @@ export interface IUsersDBModel {
 	items: ApiTypes.IUserDB[]
 }
 
-const DEFAULT_PROJECTION = { _id: false };
+const DEFAULT_PROJECTION = {_id :0, __v:0};  
 
 export class QueryRepository {
 	static async getAllBlogs(params: IReqAllBlogs) {
@@ -37,7 +37,7 @@ export class QueryRepository {
 
 			let result = await blogsCollection.find(
 				{ name: { $regex: searchNameTerm, $options: "$i" } },
-				{ projection: { ...DEFAULT_PROJECTION } }
+				DEFAULT_PROJECTION
 			)
 				.skip(+skip)
 				.limit(+pageSize)

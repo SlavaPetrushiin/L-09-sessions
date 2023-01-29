@@ -33,6 +33,8 @@ export interface IViewInputModel extends Omit<ApiTypes.IPost, "likes" | "dislike
 	}
 }
 
+const DEFAULT_PROJECTION = {_id :0, __v:0}; 
+
 export class PostService {
 	async getPosts(queries: IReqAllPosts, userId: string | null = null, blogId: string | null = null) {
 		let { pageNumber, pageSize, sortBy, sortDirection } = queries;
@@ -44,7 +46,7 @@ export class PostService {
 			postFilter.blogId = blogId;
 		}
 
-		let posts = await postsCollection.find(postFilter)
+		let posts = await postsCollection.find(postFilter, DEFAULT_PROJECTION)
 			.skip(+skip)
 			.limit(+pageSize)
 			.sort({ [sortBy]: sortDirection == "asc" ? 1 : -1 })
@@ -55,7 +57,7 @@ export class PostService {
 
 
 		let likes = await LikesModel
-			.find({})
+			.find({}, DEFAULT_PROJECTION)
 			.sort({ addedAt: -1 })
 			.lean();
 
@@ -107,14 +109,14 @@ export class PostService {
 
 	async getPost(postId: string, userId: string | null) {
 		try {
-			let foundedPost = await postsCollection.findOne({ id: postId }).lean();
+			let foundedPost = await postsCollection.findOne({ id: postId }, DEFAULT_PROJECTION).lean();
 
 			if (!foundedPost) {
 				return null;
 			}
 
 			let likes = await LikesModel
-				.find({})
+				.find({}, DEFAULT_PROJECTION)
 				.sort({ addedAt: -1 })
 				.lean();
 
@@ -241,7 +243,7 @@ export class PostService {
 
 	async addLikeOrDislike(postId: string, likeStatus: D.StatusLike, user: IUserDTO) {
 		try {
-			let foundedPost = await postsCollection.findOne({ id: postId });
+			let foundedPost = await postsCollection.findOne({ id: postId }, );
 			let { userId, login } = user;
 
 			if (!foundedPost) {
