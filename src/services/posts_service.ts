@@ -172,6 +172,8 @@ export class PostService {
 				return null;
 			}
 
+			const createdAt = new Date().toISOString();
+
 			let newPost: ApiTypes.IPost = {
 				id: (new Date().getMilliseconds()).toString(),
 				title,
@@ -179,7 +181,7 @@ export class PostService {
 				content,
 				blogId,
 				blogName: foundedBlog.name,
-				createdAt: new Date().toISOString(),
+				createdAt
 			}
 
 			const result = await PostsRepository.createPost({ ...newPost });
@@ -195,7 +197,7 @@ export class PostService {
 				content: newPost.content,
 				blogId: newPost.blogId,
 				blogName: newPost.blogName,
-				createdAt: new Date().toISOString(),
+				createdAt,
 				extendedLikesInfo: {
 					dislikesCount: 0,
 					likesCount: 0,

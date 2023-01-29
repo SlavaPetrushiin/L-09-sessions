@@ -7,6 +7,7 @@ import { ApiTypes } from '../types/types';
 import { checkError } from '../utils/checkError';
 import { BlogsService } from '../services/blogs_service';
 import { checkQueryPostsAndBlogs, IQueryBlogsAndPosts } from '../utils/checkQueryPostsAndBlogs';
+import { getUserIdByAccessToken } from '../utils/getUserIdByAccessToken';
 
 export const routerBlogs = express.Router();
 
@@ -41,7 +42,7 @@ routerBlogs.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
 	return res.send(blog);
 })
 
-routerBlogs.get('/:id/posts', checkQueryPostsAndBlogs, async (req: Request<{ id: string }, {}, {}, IQueryBlogsAndPosts>, res: Response) => {
+routerBlogs.get('/:id/posts', getUserIdByAccessToken, checkQueryPostsAndBlogs, async (req: Request<{ id: string }, {}, {}, IQueryBlogsAndPosts>, res: Response) => {
 	let id = req.params.id;
 	let blog = await QueryRepository.getOneBlog(id);
 	let userId = req.userId;
