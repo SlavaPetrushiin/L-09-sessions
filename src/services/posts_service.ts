@@ -69,7 +69,8 @@ export class PostService {
 
 		let preparePosts = posts.map(post => {
 			let filteredLikes = likes.filter(like => like.parentId === post.id);
-			let lustThreeLikes: ILikesSchema[] = (JSON.parse(JSON.stringify(filteredLikes))).sort((a: any, b: any) => new Date(a.addedAt) > new Date(b.addedAt));
+			let onlyLikes = filteredLikes.filter(like => like.status === D.StatusLike.Like);
+			let lustThreeLikes: ILikesSchema[] = (JSON.parse(JSON.stringify(onlyLikes))).sort((a: any, b: any) => new Date(a.addedAt) > new Date(b.addedAt));
 
 			if (lustThreeLikes.length > 3) {
 				lustThreeLikes.length = 3
