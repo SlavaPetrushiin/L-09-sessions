@@ -40,7 +40,7 @@ app.use("/testing/all-data", async (req: Request, res: Response) => {
   const l = LikesModel.deleteMany({});
   //const l = logCollection.deleteMany({});
 
-  await Promise.all([b, p, u, c,  s, bp, ]);
+  await Promise.all([b, p, u, c,  s, bp, l ]);
 	res.sendStatus(204);
 })
 
