@@ -9,6 +9,7 @@ export const checkBasicAuth = (req: Request, res: Response, next: NextFunction) 
 	let typeAuth = req.headers.authorization!.split(" ")[0] || "";
 	let params = req.headers.authorization!.split(" ")[1] || "";
 
+
 	let [name, password] = Buffer.from(params, 'base64').toString().split(':');
 	
 

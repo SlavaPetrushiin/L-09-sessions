@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest --config jest.config.js",
-    "test-w": "jest --config src/jest.config.ts --watch --runInBand"
+    "test-w": "jest --config src/jest.config.ts --watch --runInBand --verbose false"
   },
   "dependencies": {
     "@types/bcrypt": "^5.0.0",

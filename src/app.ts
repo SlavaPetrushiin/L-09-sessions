@@ -13,7 +13,7 @@ import cors from 'cors';
 import { routerSecurity } from './routers/securityRouter';
 
 
-const app = express();
+export const app = express();
 app.use(cors({
   credentials: true,
   origin: true,
@@ -40,7 +40,7 @@ app.use("/testing/all-data", async (req: Request, res: Response) => {
   const l = LikesModel.deleteMany({});
   //const l = logCollection.deleteMany({});
 
-  await Promise.all([b, p, u, c,  s, bp, l]);
+  await Promise.all([b, p, u, c,  s, bp, ]);
 	res.sendStatus(204);
 })
 
@@ -57,4 +57,3 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   res.send('500 - Ошибка сервера');
 })
 
-export default app

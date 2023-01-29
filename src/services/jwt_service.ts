@@ -27,6 +27,7 @@ export const convertJwtPayloadSecondsToIsoDate = (value: number): string => {
 export class ServiceJWT {
 	static async createSessionWithToken(userId: string, ipAddress: string, title: string): Promise<{ accessToken: string, refreshToken: string } | null> {
 		try {
+
 			const deviceId = uuidv4();
 			const accessToken = jwt.sign({ userId }, JWT_SECRET, { expiresIn: EXPIRES_ACCESS_TIME });
 			const refreshToken = jwt.sign({ userId, deviceId: deviceId }, process.env.REFRESH_JWT_SECRET!, { expiresIn: EXPIRES_REFRESH_TIME });
@@ -48,6 +49,7 @@ export class ServiceJWT {
 
 			return { accessToken, refreshToken };
 		} catch (error) {
+
 			return null;
 		}
 	}

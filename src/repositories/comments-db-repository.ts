@@ -4,9 +4,9 @@ import { commentsCollection } from "./db";
 export class CommentsRepository {
 	public async createComments(comment: ApiTypes.ICommentModel): Promise<ApiTypes.ICommentModel | null> {
 		try {
-			console.log("comment: ", comment);
+	
 			let result = await commentsCollection.create(comment);
-			console.log(result);
+
 			return result;
 		} catch (error) {
 			console.error(error);

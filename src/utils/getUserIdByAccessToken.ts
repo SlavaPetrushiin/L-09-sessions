@@ -9,6 +9,7 @@ export const getUserIdByAccessToken = async (req: Request, res: Response, next: 
 	try {
 		
 		if (!req.headers.authorization) {
+
 			req.userId = null;
 			return next();
 		}
@@ -17,6 +18,7 @@ export const getUserIdByAccessToken = async (req: Request, res: Response, next: 
 		const userId = await ServiceJWT.getUserIdByToken(accessToken, process.env.ACCESS_JWT_SECRET!); 
 		
 		if(!userId){
+			
 			req.userId = null;
 			return next();
 		}
@@ -24,6 +26,7 @@ export const getUserIdByAccessToken = async (req: Request, res: Response, next: 
 		let user = await ClientsRepository.getUSerByID(userId);
 
 		if (!user) {
+
 			req.userId = null;
 			return next();
 		}

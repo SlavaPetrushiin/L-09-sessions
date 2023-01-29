@@ -13,7 +13,7 @@ class AuthDevicesSessions {
 			let result = await authDevicesSessions.create(dataSession);
 			return !!result;
 		} catch (error) {
-			console.error(`Error => Not create Session: ${dataSession}`);
+			console.error(`!!!!Error => Not create Session: ${error}`);
 			return false;
 		}
 	}

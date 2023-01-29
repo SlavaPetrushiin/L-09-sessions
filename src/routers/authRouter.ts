@@ -32,18 +32,19 @@ routerAuth.post('/login', verifyNumberAttempts, async (req: Request<{}, {}, ILog
 	const { loginOrEmail, password } = req.body;
 	const ipAddress = req.ip;
 	const title = req.headers['user-agent'] || "";
+	console.log('req.headersuser-agent', req.headers['user-agent'])
 	let user = await AuthService.login(loginOrEmail, password);
+
 	if (!user) {
 		return res.sendStatus(401);
 	}
 
 	const tokens = await ServiceJWT.createSessionWithToken(user.id, ipAddress, title);
-	console.log(tokens);
 
 	if (!tokens) {
 		return res.sendStatus(401);
 	}
-
+	
 	res.cookie('refreshToken', tokens.refreshToken, { maxAge: MAX_AGE_COOKIE_MILLISECONDS, httpOnly: true, secure: true })//secure: true httpOnly: true
 	return res.status(200).send({ accessToken: tokens.accessToken });
 })

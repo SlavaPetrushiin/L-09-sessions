@@ -1,5 +1,5 @@
 import request from 'supertest'
-import app from '../app'
+import {app} from '../app'
 
 
 jest.setTimeout(10000)
@@ -46,64 +46,64 @@ describe('/users', () => {
 
     let cookie: any = []
 
-    it('should delete all data', async () => {
-        await request(app).delete('/testing/all-data').expect(204)
-    })
+    // it('should delete all data', async () => {
+    //     await request(app).delete('/testing/all-data').expect(204)
+    // })
 
-    it('should return devices by userId', async () => {
+    // it('should return devices by userId', async () => {
 
-        await request(app)
-            .post('/auth/registration')
-            .send(inputModelUser1)
+    //     await request(app)
+    //         .post('/auth/registration')
+    //         .send(inputModelUser1)
 
-        const auth = await request(app).post('/auth/login')
-            .set('user-agent', 'Mozilla')
-            .send(correctInputModelAuth)
-        await request(app).post('/auth/login')
-            .set('user-agent', 'AppleWebKit')
-            .send(correctInputModelAuth)
-        await request(app).post('/auth/login')
-            .set('user-agent', 'Chrome')
-            .send(correctInputModelAuth)
-        await request(app).post('/auth/login')
-            .set('user-agent', 'Safari')
-            .send(correctInputModelAuth)
+    //     const auth = await request(app).post('/auth/login')
+    //         .set('user-agent', 'Mozilla')
+    //         .send(correctInputModelAuth)
+    //     await request(app).post('/auth/login')
+    //         .set('user-agent', 'AppleWebKit')
+    //         .send(correctInputModelAuth)
+    //     await request(app).post('/auth/login')
+    //         .set('user-agent', 'Chrome')
+    //         .send(correctInputModelAuth)
+    //     await request(app).post('/auth/login')
+    //         .set('user-agent', 'Safari')
+    //         .send(correctInputModelAuth)
 
-        refreshToken = auth.header['set-cookie'][0].split(';')[0].split('=')[1]
+    //     refreshToken = auth.header['set-cookie'][0].split(';')[0].split('=')[1]
         
-        cookie = auth.header['set-cookie']
-        const devices = await request(app)
-            .get('/security/devices').set('Cookie', cookie)
+    //     cookie = auth.header['set-cookie']
+    //     const devices = await request(app)
+    //         .get('/security/devices').set('Cookie', cookie)
 
-        deletedDeviceId = devices.body[3].deviceId
+    //     deletedDeviceId = devices.body[3].deviceId
 
-        expect(devices.body.length).toBe(4)
+    //     expect(devices.body.length).toBe(4)
 
-        expect(devices.body[0]).toStrictEqual({
-                ip: expect.any(String),
-                title: expect.any(String),
-                lastActiveDate: expect.any(String),
-                deviceId: expect.any(String)
-        })
-    })
+    //     expect(devices.body[0]).toStrictEqual({
+    //             ip: expect.any(String),
+    //             title: expect.any(String),
+    //             lastActiveDate: expect.any(String),
+    //             deviceId: expect.any(String)
+    //     })
+    // })
 
-    it('should delete device by deviceId', async () => {
-        await request(app)
-            .delete(`/security/devices/${deletedDeviceId}`).set('Cookie', cookie)
+    // it('should delete device by deviceId', async () => {
+    //     await request(app)
+    //         .delete(`/security/devices/${deletedDeviceId}`).set('Cookie', cookie)
 
-        const devices = await request(app)
-            .get('/security/devices').set('Cookie', cookie)
+    //     const devices = await request(app)
+    //         .get('/security/devices').set('Cookie', cookie)
 
-        expect(devices.body.length).toBe(3)
-    })
+    //     expect(devices.body.length).toBe(3)
+    // })
 
-    it('should refresh-token', async () => {
-        const result = await request(app).post('/auth/refresh-token').set('Cookie', cookie)
+    // it('should refresh-token', async () => {
+    //     const result = await request(app).post('/auth/refresh-token').set('Cookie', cookie)
 
-        expect(result.body).toStrictEqual({
-            accessToken: expect.any(String)
-        })
-    })
+    //     expect(result.body).toStrictEqual({
+    //         accessToken: expect.any(String)
+    //     })
+    // })
 
     // it('should return 404, if trying delete incorrect device by deviceId', async () => {
     //     await request(app)

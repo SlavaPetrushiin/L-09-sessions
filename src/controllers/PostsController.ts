@@ -34,6 +34,7 @@ class PostsController {
 	async getPost(req: Request<{ id: string }>, res: Response<ApiTypes.IPost | boolean>) {
 		let id = req.params.id;
 		let userId = req.userId;
+
 		let foundedPost = await this.postService.getPost(id, userId);
 		if (!foundedPost) {
 			return res.sendStatus(404);

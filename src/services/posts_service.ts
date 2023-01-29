@@ -129,6 +129,7 @@ export class PostService {
 
 			let filteredLikes = likes.filter(like => like.parentId === postId);
 			let onlyLikes = filteredLikes.filter(like => like.status === D.StatusLike.Like);
+
 			let lustThreeLikes: ILikesSchema[] = (JSON.parse(JSON.stringify(onlyLikes))).sort((a: any, b: any) => new Date(a.addedAt) > new Date(b.addedAt));
 
 			if (lustThreeLikes.length > 3) {
@@ -142,6 +143,7 @@ export class PostService {
 					myStatus: cur.userId === userId ? acc.myStatus = cur.status : acc.myStatus
 				}
 			}, emptyLikes)
+			console.log('lustThreeLikes', lustThreeLikes)
 
 			let preparedPost = {
 				...foundedPost,
@@ -157,7 +159,7 @@ export class PostService {
 					)
 				}
 			}
-
+			console.log('preparedPost', preparedPost)
 			return preparedPost;
 		} catch (error) {
 			return null;
@@ -266,7 +268,7 @@ export class PostService {
 				})
 			} else {
 				foundedLike.addedAt = addedAt,
-					foundedLike.status = likeStatus;
+				foundedLike.status = likeStatus;
 			}
 
 			let result = await foundedLike.save();
