@@ -2,9 +2,10 @@ import { getUserIdByAccessToken } from './../utils/getUserIdByAccessToken';
 import { checkError } from './../utils/checkError';
 import { checkBearerAuth } from './../utils/checkBearerAuth';
 import express from 'express';
-import { commentValidator, likeStatusValidator } from '../validators/commentValidator';
+import { commentValidator } from '../validators/commentValidator';
 import { checkQueryCommentsByPostID, } from '../utils/checkQueryCommentsByPostID';
 import { commentsController } from '../controllers/CommentsController';
+import { likeStatusValidator } from '../validators/likesValidator';
 
 export const routerComments = express.Router();
 

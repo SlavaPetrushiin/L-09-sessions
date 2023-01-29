@@ -1,5 +1,6 @@
 import request from 'supertest'
-import { app } from '../app'
+import app from '../app'
+
 
 jest.setTimeout(10000)
 describe('/users', () => {

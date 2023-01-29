@@ -1,5 +1,5 @@
 import { QueryRepository } from './../repositories/query-db-repository';
-import { CommentsService, IViewCommentModel } from './../services/comments_service';
+import { CommentsService } from './../services/comments_service';
 import  { Request, Response } from 'express';
 import {  ICommentsByPostID } from '../utils/checkQueryCommentsByPostID';
 import { dictionary as D } from '../types/dictionary';

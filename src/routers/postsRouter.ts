@@ -1,71 +1,31 @@
+import express from 'express';
+import { postsController } from './../controllers/PostsController';
 import { getUserIdByAccessToken } from '../utils/getUserIdByAccessToken';
 import { checkBasicAuth } from '../utils/checkBasicAuth';
-import express, {Request, Response} from 'express';
-import { ApiTypes } from '../types/types';
 import { checkError } from '../utils/checkError';
 import { createAndUpdatePostsValidator } from '../validators/postsValidator';
-import { PostService } from '../services/posts_service';
-import { checkQueryPostsAndBlogs, IQueryBlogsAndPosts } from '../utils/checkQueryPostsAndBlogs';
-import { QueryRepository } from '../repositories/query-db-repository';
+import { checkQueryPostsAndBlogs } from '../utils/checkQueryPostsAndBlogs';
 import { checkQueryCommentsByPostID } from '../utils/checkQueryCommentsByPostID';
 import { commentsController } from '../controllers/CommentsController';
 import { checkBearerAuth } from '../utils/checkBearerAuth';
 import { commentValidator } from '../validators/commentValidator';
+import { likeStatusValidator } from '../validators/likesValidator';
 
 export const routerPosts = express.Router();
 
-routerPosts.get('/', checkQueryPostsAndBlogs,  async (req: Request<{}, {}, {}, IQueryBlogsAndPosts>, res: Response) => {
-	let {  pageNumber, pageSize, sortBy, sortDirection } = req.query;
-	let posts = await QueryRepository.getPosts({
-		pageNumber: pageNumber!,
-		pageSize: pageSize!,
-		sortBy: sortBy!,
-		sortDirection: sortDirection!
-	});
+routerPosts.get('/', getUserIdByAccessToken, checkQueryPostsAndBlogs, postsController.getPosts.bind(postsController));
+routerPosts.get('/:id', getUserIdByAccessToken, postsController.getPost.bind(postsController));
+routerPosts.post('/', checkBasicAuth, createAndUpdatePostsValidator, checkError, postsController.createPost.bind(postsController));
+routerPosts.put('/:id', checkBasicAuth, createAndUpdatePostsValidator, checkError, postsController.updatePost.bind(postsController));
+routerPosts.delete('/:id', checkBasicAuth, postsController.deletePost);
 
-	res.send(posts);
-})
-
-routerPosts.get('/:id', async (req: Request<{id: string}>, res: Response<ApiTypes.IPost | boolean>) => {
-	let id = req.params.id;
-	let foundedPost = await QueryRepository.getOnePost(id);
-	if(!foundedPost){
-		return res.sendStatus(404);
-	}
-
-	res.send(foundedPost);
-})
-
-routerPosts.post('/', checkBasicAuth, createAndUpdatePostsValidator, checkError, async (req: Request<{}, {}, ApiTypes.ICreateAndUpdateBlogParams>, res: Response<ApiTypes.IPost | boolean>) => {
-	let {blogId, content, shortDescription, title} = req.body;
-	let newPost = await PostService.createPost({blogId, content, shortDescription, title});
-
-	if(!newPost){
-		return res.sendStatus(404);
-	}
-	res.status(201).send(newPost);
-})
-
-routerPosts.put('/:id', checkBasicAuth, createAndUpdatePostsValidator, checkError, async (req: Request<{id: string}, {}, ApiTypes.ICreateAndUpdateBlogParams>, res: Response) => {
-	let {blogId,content, shortDescription, title} = req.body;
-	let {id} = req.params;
-	let isUpdatedBPost = await PostService.updatePost({id, blogId, content, shortDescription, title});
-	if(!isUpdatedBPost){
-		return res.sendStatus(404);
-	}
-
-	res.sendStatus(204);
-})
-
-routerPosts.delete('/:id', checkBasicAuth, async (req: Request<{id: string}>, res: Response) => {
-	let {id} = req.params;
-	let isDeletesPost = await PostService.deletePost(id);
-	if(!isDeletesPost){
-		return res.sendStatus(404);
-	}
-
-	res.sendStatus(204);
-})
+routerPosts.put(
+	'/:id/like-status',
+	checkBearerAuth,
+	likeStatusValidator,
+	checkError, 
+	postsController.addLikeOrDislike.bind(postsController)
+);
 
 routerPosts.get(
 	'/:postId/comments',

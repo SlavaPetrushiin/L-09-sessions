@@ -1,3 +1,4 @@
+import { LikesModel } from './schemas/LikesSchema';
 import { ApiTypes } from '../types/types';
 import { ICommentsByPostID } from '../utils/checkQueryCommentsByPostID';
 import { IQueryUsers } from '../utils/checkQueryUsers';

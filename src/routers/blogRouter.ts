@@ -10,6 +10,8 @@ import { checkQueryPostsAndBlogs, IQueryBlogsAndPosts } from '../utils/checkQuer
 
 export const routerBlogs = express.Router();
 
+const postService = new PostService();
+
 routerBlogs.get('/', checkQueryPostsAndBlogs, async (req: Request<{}, {}, {}, IQueryBlogsAndPosts>, res: Response) => {
 	let { searchNameTerm, pageNumber, pageSize, sortBy, sortDirection } = req.query;
 	let blogs = await QueryRepository.getAllBlogs({
@@ -42,15 +44,16 @@ routerBlogs.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
 routerBlogs.get('/:id/posts', checkQueryPostsAndBlogs, async (req: Request<{ id: string }, {}, {}, IQueryBlogsAndPosts>, res: Response) => {
 	let id = req.params.id;
 	let blog = await QueryRepository.getOneBlog(id);
+	let userId = req.userId;
 	if(!blog) return res.sendStatus(404);
 
 	let { pageNumber, pageSize, sortBy, sortDirection } = req.query;
-	let posts = await QueryRepository.getPosts({
+	let posts = await postService.getPosts({
 		pageNumber: pageNumber!,
 		pageSize: pageSize!,
 		sortBy: sortBy! as string,
 		sortDirection: sortDirection! as string
-	}, id);
+	}, userId, id);
 	if (!posts) {
 		return res.sendStatus(404);
 	}
@@ -64,7 +67,7 @@ routerBlogs.post('/:id/posts', checkBasicAuth, checkBlogValidator, checkError, a
 	if(!blog) return res.sendStatus(404);
 
 	let { content, shortDescription, title } = req.body;
-	let newPost = await PostService.createPost({ blogId: id, content, shortDescription, title });
+	let newPost = await postService.createPost({ blogId: id, content, shortDescription, title });
 
 	if (!newPost) {
 		return res.sendStatus(404);
@@ -90,6 +93,6 @@ routerBlogs.delete('/:id', checkBasicAuth, async (req: Request<{ id: string }>, 
 		return res.sendStatus(404);
 	}
 
-	PostService.removeAllPostsAndBlog(id);
+	await postService.removeAllPostsAndBlog(id);
 	res.sendStatus(204);
 })

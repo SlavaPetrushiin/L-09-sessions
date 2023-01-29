@@ -29,6 +29,7 @@ export const getUserIdByAccessToken = async (req: Request, res: Response, next: 
 		}
 
 		req.userId = userId;
+		req.user = {userId: userId, email: user.email, login: user.login}
 		next();
 	} catch (error) {
 		console.error("Not refreshToken in cookies");

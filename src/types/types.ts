@@ -7,6 +7,12 @@ export namespace ApiTypes {
 		description: string;
 	}
 
+	export interface IExtendedLikesInfo {
+		userId: string;
+		login: string;
+		addedAt: string;
+	}
+
 	export interface IPost {
 		id: string;
 		title: string;
@@ -70,7 +76,7 @@ export namespace ApiTypes {
 			isConfirmed: boolean;
 		}
 	}
-	export interface IRefreshToken{
+	export interface IRefreshToken {
 		user: string;
 		token: string;
 		createdByIp: string;
@@ -91,9 +97,9 @@ export namespace ApiTypes {
 		connectionDate: Date
 	}
 
-	export interface IPasswordRecovery{
-	email: string;
-  recoveryCode: string;
-	dateExpired: Date;
+	export interface IPasswordRecovery {
+		email: string;
+		recoveryCode: string;
+		dateExpired: Date;
 	}
 }
