@@ -33,7 +33,7 @@ export interface IViewInputModel extends Omit<ApiTypes.IPost, "likes" | "dislike
 	}
 }
 
-const DEFAULT_PROJECTION = {_id :0, __v:0}; 
+const DEFAULT_PROJECTION = { _id: 0, __v: 0 };
 
 export class PostService {
 	async getPosts(queries: IReqAllPosts, userId: string | null = null, blogId: string | null = null) {
@@ -67,7 +67,7 @@ export class PostService {
 			myStatus: D.StatusLike.None,
 		}
 
-		let preparePosts = posts.map(post => {
+		let preparePosts = posts.map((post, i) => {
 			let filteredLikes = likes.filter(like => like.parentId === post.id);
 			let onlyLikes = filteredLikes.filter(like => like.status === D.StatusLike.Like);
 			let lustThreeLikes: ILikesSchema[] = (JSON.parse(JSON.stringify(onlyLikes))).sort((a: any, b: any) => new Date(a.addedAt) > new Date(b.addedAt));
@@ -76,13 +76,17 @@ export class PostService {
 				lustThreeLikes.length = 3
 			}
 
-			let countLikesAndDislikes = filteredLikes.reduce((acc, cur) => {
+			let countLikesAndDislikes = filteredLikes.reduce((acc, cur, index) => {
 				return {
 					likesCount: cur.status === D.StatusLike.Like ? acc.likesCount + 1 : acc.likesCount,
 					dislikesCount: cur.status === D.StatusLike.Dislike ? acc.dislikesCount + 1 : acc.dislikesCount,
 					myStatus: cur.userId === userId ? acc.myStatus = cur.status : acc.myStatus
 				}
-			}, emptyLikes)
+			}, {
+				likesCount: 0,
+				dislikesCount: 0,
+				myStatus: D.StatusLike.None,
+			})
 
 			return {
 				...post,
@@ -143,7 +147,6 @@ export class PostService {
 					myStatus: cur.userId === userId ? acc.myStatus = cur.status : acc.myStatus
 				}
 			}, emptyLikes)
-			console.log('lustThreeLikes', lustThreeLikes)
 
 			let preparedPost = {
 				...foundedPost,
@@ -159,7 +162,7 @@ export class PostService {
 					)
 				}
 			}
-			console.log('preparedPost', preparedPost)
+
 			return preparedPost;
 		} catch (error) {
 			return null;
@@ -248,7 +251,7 @@ export class PostService {
 
 	async addLikeOrDislike(postId: string, likeStatus: D.StatusLike, user: IUserDTO) {
 		try {
-			let foundedPost = await postsCollection.findOne({ id: postId }, );
+			let foundedPost = await postsCollection.findOne({ id: postId },);
 			let { userId, login } = user;
 
 			if (!foundedPost) {
@@ -268,7 +271,7 @@ export class PostService {
 				})
 			} else {
 				foundedLike.addedAt = addedAt,
-				foundedLike.status = likeStatus;
+					foundedLike.status = likeStatus;
 			}
 
 			let result = await foundedLike.save();

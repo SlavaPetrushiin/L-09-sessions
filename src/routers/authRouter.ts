@@ -32,7 +32,6 @@ routerAuth.post('/login', verifyNumberAttempts, async (req: Request<{}, {}, ILog
 	const { loginOrEmail, password } = req.body;
 	const ipAddress = req.ip;
 	const title = req.headers['user-agent'] || "";
-	console.log('req.headersuser-agent', req.headers['user-agent'])
 	let user = await AuthService.login(loginOrEmail, password);
 
 	if (!user) {
